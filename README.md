@@ -1,7 +1,7 @@
-# 02_Louise---Team-7
+# 02_Som---Team-7
 
 # Project Title  
-**Emotional Topography: A Living Data Ecosystem**
+**Emotional Data Ecosystem**
 
 ---
 
@@ -51,7 +51,7 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ---
 
-## 1. Audio-driven Mechanism (Member A)
+## 1. Audio-driven Mechanism (Ying Hu)
 
 Users select their current emotion, triggering pre-set “heartbeat signal” audio that generates rhythmic data through variations in the heartbeat. Louder sounds translate into more intense “heartbeats,” driving the core structures of the visual system to expand, vibrate, or pulse. Simultaneously, different frequency bands are mapped to distinct visual attributes—such as color shifts or morphological changes—enabling the system to express more complex emotional states.
 
