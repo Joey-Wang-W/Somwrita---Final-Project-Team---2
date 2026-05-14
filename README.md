@@ -32,9 +32,6 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 ![Inspiration3](readmeImages/7b23d4bcbd188ff4beb90803a27a6552.jpg)
 
 - Yu-Chieh Lin – *Heartbeat Topography*  
-- Memo Akten – *Deep Meditations*  
-- Bio-data visualization and immersive installation practices  
-- Nature-inspired generative systems  
 
 ---
 
@@ -44,10 +41,10 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 | Member | Mechanism | Responsibility |
 |--------|----------|---------------|
-| A | Audio-driven system | Capture and analyze sound data |
-| B | Time-based system | Control lifecycle and transitions |
-| C | Perlin noise & randomness | Generate organic motion and forms |
-| D | User interaction | Design interaction and control system |
+| Ying Hu | Audio-driven system | Capture and analyze sound data |
+| Jade Gu | Time-based system | Control lifecycle and transitions |
+| Yidan Wang | Perlin noise & randomness | Generate organic motion and forms |
+| Hantao Xu | User interaction | Design interaction and control system |
 
 ---
 
@@ -59,7 +56,7 @@ On the interactive level, users can click the main object with a mouse to genera
 
 ---
 
-## 2. Time-based Mechanism (Member B)
+## 2. Time-based Mechanism (Jade Gu)
 
 The time-based system controls the lifecycle of the visual ecosystem through a continuous timeline. The system evolves through phases: generation, growth, mutation, and decay.
 
@@ -69,7 +66,7 @@ This mechanism introduces a narrative dimension, simulating emotional cycles suc
 
 ---
 
-## 3. Perlin Noise & Randomness (Member C)
+## 3. Perlin Noise & Randomness (Yidan Wang)
 
 This mechanism uses Perlin noise to generate smooth, continuous, and natural motion patterns. It controls particle behavior, deformation, and spatial distribution, allowing the visuals to resemble organic phenomena such as fluid, smoke, or biological growth.
 
@@ -79,29 +76,20 @@ This system forms the generative core of the project, transforming abstract data
 
 ---
 
-## 4. User Interaction Mechanism (Member D)
+## 4. User Interaction Mechanism (Hantao Xu)
 
-User interaction is implemented through mouse and keyboard input. Mouse movement affects the distribution and flow of particles, attracting or repelling them within the space. Clicking triggers local disruptions such as bursts or reconfigurations.
+The user interaction mechanism moves beyond basic point-to-point tracking by implementing a memory-based trajectory system. Using mouse input, the program continuously records the movement history of the user over a rolling ten-second window. The central digital ecosystem responds to the overall shape and intensity of this recent history rather than just the current cursor position. 
 
-Keyboard inputs allow users to switch between different system states, such as “stable,” “chaotic,” or “reconstruction.”
+Smooth and continuous gestures will calm the generative environment and produce soft visual pulsations. On the other hand, erratic and sharp movements leave lasting disruptions in the data space, causing the surrounding Perlin noise terrain to become chaotic and unstable.
 
-This mechanism positions the user as an active participant within the ecosystem, rather than a passive observer. It highlights the role of human agency in shaping emotional and data-driven systems, while also reflecting the instability of control within complex environments.
+ This approach serves as a metaphor for how our present emotional states are constantly shaped by the lingering effects of our immediate past.It positions the user as an active catalyst whose behavioral history directly molds the stability and flow of the digital topography.
 
 ---
 
-# 3. Integration (≤100 words)
+# 3. Integration 
 
 All mechanisms are integrated within a shared visual canvas to form a cohesive emotional ecosystem. Audio input provides energy, time defines the lifecycle, Perlin noise generates organic motion, and user interaction disrupts and reshapes the system.
 
 Together, they create a dynamic balance between order and chaos. The project is unified both visually and conceptually as a “living emotional landscape,” where data, perception, and interaction continuously influence one another.
-
----
-
-# 4. References
-
-- Yu-Chieh Lin – *Heartbeat Topography* (2022)  
-- Memo Akten – *Deep Meditations*  
-- Generative art and bio-data visualization practices  
-- Interactive installation art (e.g., Rafael Lozano-Hemmer)  
 
 ---
