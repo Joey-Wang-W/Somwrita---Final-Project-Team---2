@@ -13,13 +13,11 @@ This project reinterprets an existing artwork, based on
 
 ## Original Artwork  
 
-![Reference](image1.png)
-
 Yu-Chieh Lin’s work captures real-time heartbeat data and transforms it into dynamic visual landscapes. By synchronizing physiological rhythms with external sensory stimuli, the project creates an immersive environment that connects body, emotion, and digital systems.
 
 ---
 
-## Creative Vision (≤150 words)  
+## Creative Vision 
 
 Our project expands on *Heartbeat Topography* by shifting the focus from physiological signals to emotional states. Inspired by Yu-Chieh Lin’s translation of heartbeat into visual landscapes, and influenced by organic AI-generated aesthetics such as Memo Akten’s *Deep Meditations*, we aim to construct a dynamic “emotional ecosystem.”
 
@@ -29,7 +27,9 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ## References / Inspirations  
 
-![Inspiration](image2.png)
+![Inspiration](readmeImages/190e5227fbf7f904f8055828fb691cc3.jpg)
+![Inspiration2](readmeImages/284f1b6b18d22715291fa3df9608ac2f.jpg)
+![Inspiration3](readmeImages/7b23d4bcbd188ff4beb90803a27a6552.jpg)
 
 - Yu-Chieh Lin – *Heartbeat Topography*  
 - Memo Akten – *Deep Meditations*  
