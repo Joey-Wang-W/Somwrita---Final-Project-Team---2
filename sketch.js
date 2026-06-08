@@ -9,6 +9,8 @@ let myPlanet;
 // Accumulates rotation angle to prevent phase-shift matrix snapping bugs during speed scaling
 let hantao_rotationAngle = 0; 
 
+let yidanPerlinMechanic;
+
 function setup() {
   // Create WEBGL 3D rendering canvas
   createCanvas(windowWidth, windowHeight, WEBGL);
@@ -18,6 +20,9 @@ function setup() {
   
   // Instantiate the sphere object
   myPlanet = new OscilloscopeSphere();
+
+  yidanPerlinMechanic = new PerlinRandomMechanic();
+  myPlanet.setDeformationProvider(yidanPerlinMechanic);
 }
 
 function draw() {
@@ -32,6 +37,8 @@ function draw() {
   
   // Get the global activity coefficient from the interaction script
   let currentActivity = getHantaoInteraction();
+
+  yidanPerlinMechanic.update(currentActivity);
 
   // Increment rotation angle based on current activity scalar
   hantao_rotationAngle += 0.001 * currentActivity;

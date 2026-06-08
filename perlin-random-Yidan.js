@@ -1,21 +1,22 @@
 // Perlin Noise & Randomness mechanic
 // Creative director: Yidan Wang
-// This mechanic uses Perlin noise and random seeds to create organic motion and variation.
+// This mechanic uses p5.js noise() and randomSeed() to create smooth organic variation.
 
 class PerlinRandomMechanic {
   constructor() {
     this.seed = floor(random(100000));
-    noiseSeed(this.seed);
+
     randomSeed(this.seed);
+    noiseSeed(this.seed);
 
     this.time = 0;
-    this.noiseSpeed = random(0.003, 0.01);
-    this.noiseScale = random(1.0, 2.0);
+    this.noiseSpeed = random(0.003, 0.009);
+    this.noiseScale = random(1.0, 2.4);
     this.deformationStrength = random(80, 180);
   }
 
-  update() {
-    this.time += this.noiseSpeed;
+  update(activity = 1) {
+    this.time += this.noiseSpeed * activity;
   }
 
   getDeformation(xDir, yDir, zDir) {
