@@ -26,6 +26,8 @@ function setup() {
   
   // Enable antialiasing for smooth line rendering edges
   setAttributes('antialias', true); 
+
+    textFont(ying_font);
   
   // Instantiate the sphere object
   myPlanet = new OscilloscopeSphere();
@@ -43,6 +45,8 @@ function setup() {
     emotionSlider.addEventListener('input', updateEmotionFromSlider);
     updateEmotionFromSlider();
   }
+
+  setupAudio();
 }
 
 function draw() {
@@ -54,9 +58,9 @@ function draw() {
 
   // Tilt camera on X-axis at a fixed angle for a perspective view
   rotateX(PI / 3.5);
-  
-  // Get the global activity coefficient from the interaction script
-  let currentActivity = getHantaoInteraction();
+
+  // Merge activity levels from both sources
+  let currentActivity = max(getHantaoInteraction(), getYingAudio());
 
   yidanPerlinMechanic.update(currentActivity, emotionValue);
 
@@ -71,6 +75,35 @@ function draw() {
   
   // Render the sphere geometry
   myPlanet.display();
+
+  // Add UI
+  push();
+  camera(); 
+  ortho();  
+  translate(-width/2, -height/2); // ← 加这一行
+  drawEmotionUI();
+  pop();
+  
+}
+
+let ying_font;
+
+function preload() {
+  preloadAudio();
+  ying_font = loadFont('https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf');
+}
+
+function mousePressed() {
+  sliderMousePressed();
+  triggerHeartbeatPulse();
+}
+
+function mouseDragged() {
+  sliderMouseDragged();
+}
+
+function mouseReleased() {
+  sliderMouseReleased();
 }
 
 function windowResized() {
