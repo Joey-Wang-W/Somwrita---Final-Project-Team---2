@@ -8,21 +8,27 @@
 class OscilloscopeSphere {
   constructor() {
     // Baseline radius
-    this.radius = 150;       
-    
+    this.radius = 150;
+
     // Latitude resolution (number of horizontal rings)
-    this.latitudes = 75;     
-    
+    this.latitudes = 75;
+
     // Longitude resolution (vertices per ring)
-    this.longitudes = 160;   
-    
+    this.longitudes = 160;
+
     this.timeOffset = 0;
+
+    this.deformationProvider = null;
   }
 
   // Accept external activity to adjust time offset
   update(activity) {
     // Update time offset weighted by activity to control wave evolution speed
     this.timeOffset += 0.007 * activity;
+  }
+
+  setDeformationProvider(provider) {
+    this.deformationProvider = provider;
   }
 
   display() {
@@ -32,46 +38,50 @@ class OscilloscopeSphere {
 
     // Initialize noise height cache array
     let noiseCache = [];
-    
+
     for (let i = 0; i <= this.latitudes; i++) {
       let lat = map(i, 0, this.latitudes, 0.01 * PI, 0.99 * PI);
       noiseCache[i] = [];
-      
+
       for (let j = 0; j <= this.longitudes; j++) {
         let lon = map(j, 0, this.longitudes, 0, TWO_PI);
 
         // Compute baseline spherical direction vectors
         let xDir = sin(lat) * cos(lon);
-        let yDir = cos(lat); 
+        let yDir = cos(lat);
         let zDir = sin(lat) * sin(lon);
 
         // Compute Perlin noise based on direction vectors and time offset
-        let macroNoise = noise(
-          xDir * 1.3 + this.timeOffset, 
-          yDir * 1.3, 
-          zDir * 1.3 + this.timeOffset
-        );
-        
-        // Map noise to terrain displacement height range
-        noiseCache[i][j] = map(macroNoise, 0, 1, -100, 200);
+        if (this.deformationProvider) {
+          // Yidan's Perlin mechanic supplies smooth organic displacement values
+          noiseCache[i][j] = this.deformationProvider.getDeformation(xDir, yDir, zDir);
+        } else {
+          let macroNoise = noise(
+            xDir * 1.3 + this.timeOffset,
+            yDir * 1.3,
+            zDir * 1.3 + this.timeOffset
+          );
+
+          noiseCache[i][j] = map(macroNoise, 0, 1, -100, 200);
+        }
       }
     }
 
     // Render multi-layered shell structure
     for (let layer = 0; layer < 3; layer++) {
-      
+
       // Calculate radial offset for the current shell layer
-      let currentOffset = layer * 15; 
+      let currentOffset = layer * 15;
 
       for (let i = 1; i < this.latitudes; i++) {
         let lat = map(i, 0, this.latitudes, 0.01 * PI, 0.99 * PI);
-        
+
         // Compute latitude-based alpha gradient (fading near poles)
-        let baseAlpha = map(sin(lat), 0, 1, 15, 190); 
-        
+        let baseAlpha = map(sin(lat), 0, 1, 15, 190);
+
         // Compute alpha attenuation for outer shell layers
-        let layerAlpha = baseAlpha * (1.0 - layer * 0.3); 
-        
+        let layerAlpha = baseAlpha * (1.0 - layer * 0.3);
+
         // Apply stroke color and alpha
         stroke(50, 255, 130, layerAlpha);
 
@@ -81,7 +91,7 @@ class OscilloscopeSphere {
           let lon = map(j, 0, this.longitudes, 0, TWO_PI);
 
           let xDir = sin(lat) * cos(lon);
-          let yDir = cos(lat); 
+          let yDir = cos(lat);
           let zDir = sin(lat) * sin(lon);
 
           // Combine baseline terrain data with current layer offset

@@ -6,3 +6,51 @@ html, body {
 canvas {
   display: block;
 }
+
+/* Shared emotion slider UI.
+   It sits over the canvas without changing the p5.js drawing system. */
+#emotion-ui {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  width: min(520px, calc(100vw - 48px));
+  padding: 16px 18px 14px;
+  color: white;
+  font-family: Arial, sans-serif;
+  background: rgba(12, 16, 18, 0.72);
+  border: 1px solid rgba(120, 255, 190, 0.28);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+
+/* Small heading explaining what the control represents. */
+#emotion-title {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(210, 255, 230, 0.72);
+}
+
+/* Live text label updated by sketch.js as the slider moves. */
+#emotion-label {
+  margin-top: 4px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Browser-native slider used as the shared emotion input. */
+#emotion-slider {
+  width: 100%;
+  accent-color: rgb(80, 255, 150);
+}
+
+/* End labels clarify the emotional range without needing extra buttons. */
+#emotion-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(230, 255, 240, 0.62);
+}
