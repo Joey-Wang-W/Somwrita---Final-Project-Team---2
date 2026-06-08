@@ -18,6 +18,8 @@ function setup() {
   
   // Instantiate the sphere object
   myPlanet = new OscilloscopeSphere();
+
+  setupAudio();
 }
 
 function draw() {
@@ -29,9 +31,9 @@ function draw() {
 
   // Tilt camera on X-axis at a fixed angle for a perspective view
   rotateX(PI / 3.5);
-  
-  // Get the global activity coefficient from the interaction script
-  let currentActivity = getHantaoInteraction();
+
+  // Merge activity levels from both sources
+  let currentActivity = max(getHantaoInteraction(), getYingAudio());
 
   // Increment rotation angle based on current activity scalar
   hantao_rotationAngle += 0.001 * currentActivity;
@@ -44,6 +46,32 @@ function draw() {
   
   // Render the sphere geometry
   myPlanet.display();
+
+  // Add UI
+  push();
+  camera(); 
+  ortho();  
+  translate(-width/2, -height/2); // ← 加这一行
+  drawEmotionUI();
+  pop();
+  
+}
+
+function preload() {
+  preloadAudio();
+}
+
+function mousePressed() {
+  sliderMousePressed();
+  triggerHeartbeatPulse();
+}
+
+function mouseDragged() {
+  sliderMouseDragged();
+}
+
+function mouseReleased() {
+  sliderMouseReleased();
 }
 
 function windowResized() {
