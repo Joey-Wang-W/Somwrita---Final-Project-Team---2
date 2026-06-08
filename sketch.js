@@ -76,13 +76,6 @@ function draw() {
   // Render the sphere geometry
   myPlanet.display();
 
-  // Add UI
-  push();
-  camera(); 
-  ortho();  
-  translate(-width/2, -height/2); // ← 加这一行
-  drawEmotionUI();
-  pop();
   
 }
 
@@ -94,17 +87,9 @@ function preload() {
 }
 
 function mousePressed() {
-  sliderMousePressed();
   triggerHeartbeatPulse();
 }
 
-function mouseDragged() {
-  sliderMouseDragged();
-}
-
-function mouseReleased() {
-  sliderMouseReleased();
-}
 
 function windowResized() {
   // Handle responsive canvas scaling on window resize
