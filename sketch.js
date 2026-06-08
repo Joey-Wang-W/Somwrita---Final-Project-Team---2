@@ -1,40 +1,52 @@
+// =========================================================================
+// AI acknowledgement: This file was updated with the help of Gemini, 
+// based on the core structure and rotation accumulation concept provided by the user. 
+// It coordinates the rendering loop and handles variable speed rotation mapping.
+// =========================================================================
+
 let myPlanet;
-// 引入增量角度变量，防止动态改变自转速度时画面产生瞬间旋转跳变的 Bug
+
+// Accumulates rotation angle to prevent phase-shift matrix snapping bugs during speed scaling
 let hantao_rotationAngle = 0; 
 
 function setup() {
-  // 创建 WEBGL 3D 渲染画布
+  // Create WEBGL 3D rendering canvas
   createCanvas(windowWidth, windowHeight, WEBGL);
-  // 开启抗锯齿，确保 1 像素的全息线条足够细腻、没有毛刺
+  
+  // Enable antialiasing for smooth line rendering edges
   setAttributes('antialias', true); 
   
-  // 实例化球体对象
+  // Instantiate the sphere object
   myPlanet = new OscilloscopeSphere();
 }
 
 function draw() {
-  // 设置深邃的赛博暗色背景
+  // Set background color
   background(5, 5, 8);
-  // 开启鼠标轨道控制，允许在预览窗口拖拽、缩放视角
+  
+  // Enable mouse camera orbit control for dragging and zooming
   orbitControl(); 
 
-  // 倾斜相机视角，营造全息等高线沙盘的俯瞰透视感
+  // Tilt camera on X-axis at a fixed angle for a perspective view
   rotateX(PI / 3.5);
   
-  // 获取过去 10 秒鼠标轨迹累计算出来的全局活跃度系数 (0.1 ~ 1.0+)
+  // Get the global activity coefficient from the interaction script
   let currentActivity = getHantaoInteraction();
 
-  // 根据当前的活跃度，动态累加旋转角度（平时速度只有原本的 10%）
+  // Increment rotation angle based on current activity scalar
   hantao_rotationAngle += 0.001 * currentActivity;
+  
+  // Apply Y-axis rotation transformation
   rotateY(hantao_rotationAngle); 
 
-  // 驱动球体数据演变（将活跃度喂给时间轴，控制地形波动速度）
+  // Update the sphere's internal data state with current activity
   myPlanet.update(currentActivity);
-  // 渲染球体
+  
+  // Render the sphere geometry
   myPlanet.display();
 }
 
 function windowResized() {
-  // 窗口自适应缩放
+  // Handle responsive canvas scaling on window resize
   resizeCanvas(windowWidth, windowHeight);
 }
