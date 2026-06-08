@@ -2,7 +2,9 @@
 
 // 用一个纯数值作为能量池，彻底抛弃会产生延迟饱和的数组队列
 let hantao_energyPool = 0; 
-let hantao_smoothedActivity = 0.1; // 初始处于 10% 的低能冬眠状态
+
+// 🔥【微调点 1】：把初始冬眠活跃度同步降低到 0.02 (2% 速度)
+let hantao_smoothedActivity = 0.02; 
 
 function getHantaoInteraction() {
   // 1. 计算当前这一帧鼠标相对于上一帧移动了多少像素的物理距离
@@ -12,19 +14,18 @@ function getHantaoInteraction() {
   if (frameDistance > 300) frameDistance = 0;
 
   // 2. 注入充能：鼠标只要在动，就按比例实时转化为能量注入池中
-  // 调整 0.03 可以改变充能速度（数值越大，稍微一动就越快充满）
   hantao_energyPool += frameDistance * 0.03;
 
-  // 3. 🔥 核心即时减速机制：物理阻尼自然蒸发
-  // 每一帧能量池都自动乘以 0.99。鼠标一旦停下，没有任何排队延迟，立刻开始丝滑减速！
-  // 0.99 确保连续 5 秒（300帧）不动时，能量刚好蒸发掉 95% 以上，精准跌回底层
+  // 3. 核心即时减速机制：物理阻尼自然蒸发
   hantao_energyPool *= 0.99;
 
-  // 约束能量池范围在 0 到 1.0 之间，从根本上斩断“能量过度饱和溢出”的 Bug
+  // 约束能量池范围在 0 到 1.0 之间
   hantao_energyPool = constrain(hantao_energyPool, 0, 1.0);
 
-  // 4. 能量线性映射：0 能量 = 10% 活跃度 (0.1)；满能量 = 100% 活跃度 (1.0)
-  let targetActivity = map(hantao_energyPool, 0, 1.0, 0.1, 1.0);
+  // 4. 🔥【核心修改 - 动态范围拉满】：
+  // 0 能量时 = 映射为极度静止的 2% 活跃度 (0.02)，球体几乎完全冻结
+  // 满能量时 = 映射为原本 2.5 倍的超频暴走活跃度 (2.5)，自转和地表波动疯狂加速
+  let targetActivity = map(hantao_energyPool, 0, 1.0, 0.02, 2.5);
   
   // 5. 阻尼缓动：让能量在充能和消退的过渡瞬间显得更有科技画面的质感
   hantao_smoothedActivity = lerp(hantao_smoothedActivity, targetActivity, 0.1);
