@@ -1,211 +1,249 @@
 // =========================================================================
-// AI acknowledgement: This file was generated with the help of Claude, 
-// Audio-driven Mechanism
+// AI acknowledgement: This file was updated with the help of Codex.
+// Audio-driven mechanism
 // Creator: Ying Hu
-// Function: Emotion selection → Play heartbeat audio → Analyze volume and frequency bands → Output activity level
+// Function:
+// - Read the shared HTML emotion slider from sketch.js: emotionValue (-1..1)
+// - Crossfade several heartbeat audio tracks across the emotion range
+// - Analyze the active audio mix and output an activity level for the sphere
 // =========================================================================
 
-
-let ying_mic;
 let ying_fft;
 let ying_audioActivity = 0.02;
 let ying_sounds = {};
+let ying_started = false;
 let ying_currentColor = [80, 180, 255];
 
-// 滑轨值 0.0(悲伤) ~ 0.5(平静) ~ 1.0(兴奋)
-let ying_sliderValue = 0.5;
+// -1 = unpleasant, 0 = neutral/calm, 1 = pleasant.
+const ying_emotionStops = [
+  {
+    name: 'sad',
+    value: -1.0,
+    file: 'sounds/heartbeat_sad.mp3',
+    color: [90, 105, 225],
+    boost: 1.15
+  },
+  {
+    name: 'anxious',
+    value: -0.35,
+    file: 'sounds/heartbeat_anxious.mp3',
+    color: [210, 80, 135],
+    boost: 2.35
+  },
+  {
+    name: 'calm',
+    value: 0.25,
+    file: 'sounds/heartbeat_calm.mp3',
+    color: [80, 190, 255],
+    boost: 1.45
+  },
+  {
+    name: 'excited',
+    value: 1.0,
+    file: 'sounds/heartbeat_excited.mp3',
+    color: [255, 205, 55],
+    boost: 4.75
+  }
+];
 
-// 是否正在拖动滑轨
-let ying_dragging = false;
-
-// 滑轨UI参数
-let ying_sliderX = 30;
-let ying_sliderY = 80;
-let ying_sliderW = 200;
-let ying_sliderH = 12;
-
-// 三种情绪配置
-let ying_emotionConfig = {
-  sad:     { file: 'sounds/heartbeat_sad.mp3',     color: [100, 100, 220], boost: 1.0 },
-  calm:    { file: 'sounds/heartbeat_calm.mp3',    color: [80, 180, 255],  boost: 1.5 },
-  excited: { file: 'sounds/heartbeat_excited.mp3', color: [255, 200, 50],  boost: 5.0 }
-};
-
-// -------------------------------------------------------
 function preloadAudio() {
-  for (let emotion in ying_emotionConfig) {
-    ying_sounds[emotion] = loadSound(ying_emotionConfig[emotion].file);
+  for (const stop of ying_emotionStops) {
+    loadYingSound(stop);
   }
 }
 
-// -------------------------------------------------------
 function setupAudio() {
-  ying_mic = new p5.AudioIn();
-  ying_mic.start();
-  ying_fft = new p5.FFT(0.8, 64);
-  ying_fft.setInput(ying_mic);
-
-  // 默认播放全部，用音量控制混合
-  for (let emotion in ying_sounds) {
-    ying_sounds[emotion].loop();
-    ying_sounds[emotion].setVolume(0);
+  // define a p5 preload() hook.
+  for (const stop of ying_emotionStops) {
+    if (!ying_sounds[stop.name]) {
+      loadYingSound(stop);
+    }
   }
-  // 默认平静音量为1
-  ying_sounds['calm'].setVolume(1);
+
+  ying_fft = new p5.FFT(0.82, 64);
+  startYingAudio();
 }
 
-// -------------------------------------------------------
-// 根据滑轨位置混合三种音频的音量
-function updateAudioMix() {
-  let v = ying_sliderValue; // 0~1
-
-  let sadVol, calmVol, excitedVol;
-
-  if (v < 0.5) {
-    // 左半段：悲伤 → 平静
-    let t = v / 0.5; // 0~1
-    sadVol     = 1.0 - t;
-    calmVol    = t;
-    excitedVol = 0;
-  } else {
-    // 右半段：平静 → 兴奋
-    let t = (v - 0.5) / 0.5; // 0~1
-    sadVol     = 0;
-    calmVol    = 1.0 - t;
-    excitedVol = t;
-  }
-
-  ying_sounds['sad'].setVolume(sadVol);
-  ying_sounds['calm'].setVolume(calmVol);
-  ying_sounds['excited'].setVolume(excitedVol);
-
-  // 根据滑轨位置插值当前颜色
-  let sad = ying_emotionConfig['sad'].color;
-  let calm = ying_emotionConfig['calm'].color;
-  let exc = ying_emotionConfig['excited'].color;
-
-  if (v < 0.5) {
-    let t = v / 0.5;
-    ying_currentColor = [
-      lerp(sad[0], calm[0], t),
-      lerp(sad[1], calm[1], t),
-      lerp(sad[2], calm[2], t)
-    ];
-  } else {
-    let t = (v - 0.5) / 0.5;
-    ying_currentColor = [
-      lerp(calm[0], exc[0], t),
-      lerp(calm[1], exc[1], t),
-      lerp(calm[2], exc[2], t)
-    ];
-  }
+function loadYingSound(stop) {
+  ying_sounds[stop.name] = loadSound(stop.file, () => {
+    if (ying_started) {
+      prepareYingSound(stop);
+      updateAudioMix();
+    }
+  });
 }
 
-// -------------------------------------------------------
-function getYingAudio() {
+function prepareYingSound(stop) {
+  const sound = ying_sounds[stop.name];
+  if (!sound || !sound.isLoaded()) return false;
+
+  sound.setVolume(0);
+  if (!sound.isPlaying()) {
+    sound.loop();
+  }
+
+  return true;
+}
+
+function startYingAudio() {
+  // a user gesture before the audio context is allowed to make sound.
+  userStartAudio();
+
+  for (const stop of ying_emotionStops) {
+    prepareYingSound(stop);
+  }
+
+  const firstSound = ying_sounds[ying_emotionStops[0].name];
+  if (firstSound) {
+    ying_fft.setInput(firstSound);
+  }
+
+  ying_started = true;
   updateAudioMix();
+}
 
-  let vol = ying_mic.getLevel();
-  let spectrum = ying_fft.analyze();
-  let bass = 0;
-  for (let i = 0; i < 8; i++) bass += spectrum[i];
-  bass = bass / 8 / 255;
+function yingSmoothstep(t) {
+  t = constrain(t, 0, 1);
+  return t * t * (3 - 2 * t);
+}
 
-  let rawEnergy = vol * 0.4 + bass * 0.6;
-
-  // boost 也根据滑轨位置插值
-  let boostSad  = ying_emotionConfig['sad'].boost;
-  let boostCalm = ying_emotionConfig['calm'].boost;
-  let boostExc  = ying_emotionConfig['excited'].boost;
-  let boost;
-  if (ying_sliderValue < 0.5) {
-    boost = lerp(boostSad, boostCalm, ying_sliderValue / 0.5);
-  } else {
-    boost = lerp(boostCalm, boostExc, (ying_sliderValue - 0.5) / 0.5);
+function getYingEmotionValue() {
+  if (typeof emotionValue === 'number') {
+    return constrain(emotionValue, -1, 1);
   }
 
-  let amplified = rawEnergy * boost;
-  let targetActivity = map(amplified, 0, 1, 0.02, 3.0);
-  targetActivity = constrain(targetActivity, 0.02, 3.0);
-  ying_audioActivity = lerp(ying_audioActivity, targetActivity, 0.12);
+  const slider = document.getElementById('emotion-slider');
+  if (slider) {
+    return constrain(Number(slider.value), -1, 1);
+  }
 
+  return 0;
+}
+
+function getYingMix(v) {
+  const weights = {};
+
+  for (let i = 0; i < ying_emotionStops.length; i++) {
+    weights[ying_emotionStops[i].name] = 0;
+  }
+
+  if (v <= ying_emotionStops[0].value) {
+    weights[ying_emotionStops[0].name] = 1;
+    return weights;
+  }
+
+  const last = ying_emotionStops[ying_emotionStops.length - 1];
+  if (v >= last.value) {
+    weights[last.name] = 1;
+    return weights;
+  }
+
+  for (let i = 0; i < ying_emotionStops.length - 1; i++) {
+    const left = ying_emotionStops[i];
+    const right = ying_emotionStops[i + 1];
+
+    if (v >= left.value && v <= right.value) {
+      const t = yingSmoothstep((v - left.value) / (right.value - left.value));
+      weights[left.name] = 1 - t;
+      weights[right.name] = t;
+      return weights;
+    }
+  }
+
+  weights.calm = 1;
+  return weights;
+}
+
+function getWeightedAudioProperty(weights, key) {
+  let total = 0;
+
+  for (const stop of ying_emotionStops) {
+    total += stop[key] * (weights[stop.name] || 0);
+  }
+
+  return total;
+}
+
+function getWeightedColor(weights) {
+  const color = [0, 0, 0];
+
+  for (const stop of ying_emotionStops) {
+    const weight = weights[stop.name] || 0;
+    color[0] += stop.color[0] * weight;
+    color[1] += stop.color[1] * weight;
+    color[2] += stop.color[2] * weight;
+  }
+
+  return color;
+}
+
+function getDominantYingSound(weights) {
+  let strongestStop = ying_emotionStops[0];
+  let strongestWeight = -1;
+
+  for (const stop of ying_emotionStops) {
+    const weight = weights[stop.name] || 0;
+    if (weight > strongestWeight) {
+      strongestWeight = weight;
+      strongestStop = stop;
+    }
+  }
+
+  return ying_sounds[strongestStop.name];
+}
+
+function updateAudioMix() {
+  const emotion = getYingEmotionValue();
+  const weights = getYingMix(emotion);
+
+  for (const stop of ying_emotionStops) {
+    const sound = ying_sounds[stop.name];
+    if (sound) {
+      sound.setVolume(weights[stop.name] || 0, 0.18);
+    }
+  }
+
+  const dominantSound = getDominantYingSound(weights);
+  if (dominantSound) {
+    ying_fft.setInput(dominantSound);
+  }
+
+  ying_currentColor = getWeightedColor(weights);
+  return weights;
+}
+
+function getYingAudio() {
+  const weights = updateAudioMix();
+
+  let spectrum = ying_fft ? ying_fft.analyze() : [];
+  let bass = 0;
+  let lowMid = 0;
+
+  for (let i = 0; i < 8; i++) bass += spectrum[i] || 0;
+  for (let i = 8; i < 18; i++) lowMid += spectrum[i] || 0;
+
+  bass = bass / 8 / 255;
+  lowMid = lowMid / 10 / 255;
+
+  const rawEnergy = bass * 0.72 + lowMid * 0.28;
+  const boost = getWeightedAudioProperty(weights, 'boost');
+  const targetActivity = constrain(map(rawEnergy * boost, 0, 1, 0.02, 3.0), 0.02, 3.0);
+
+  ying_audioActivity = lerp(ying_audioActivity, targetActivity, 0.12);
   return ying_audioActivity;
 }
 
-// -------------------------------------------------------
 function triggerHeartbeatPulse() {
-  let cx = width / 2;
-  let cy = height / 2;
-  if (dist(mouseX, mouseY, cx, cy) < 200) {
+  startYingAudio();
+
+  const cx = width / 2;
+  const cy = height / 2;
+
+  if (dist(mouseX, mouseY, cx, cy) < 220) {
     ying_audioActivity = min(ying_audioActivity + 0.8, 3.0);
   }
 }
 
-// -------------------------------------------------------
-// 滑轨交互（在 sketch.js 的 mousePressed/mouseDragged/mouseReleased 里调用）
-function sliderMousePressed() {
-  // 补偿WEBGL坐标偏移
-  let mx = mouseX;
-  let my = mouseY;
-  let thumbX = ying_sliderX + ying_sliderValue * ying_sliderW;
-  let thumbY = ying_sliderY + ying_sliderH / 2;
-  if (dist(mx, my, thumbX, thumbY) < 20) {
-    ying_dragging = true;
-  }
-}
-
-function sliderMouseDragged() {
-  if (ying_dragging) {
-    ying_sliderValue = constrain(
-      (mouseX - ying_sliderX) / ying_sliderW,
-      0, 1
-    );
-  }
-}
-
-function sliderMouseReleased() {
-  ying_dragging = false;
-}
-
-// -------------------------------------------------------
-// 绘制滑轨UI（在 sketch.js draw() 最后的 push/camera/ortho 块里调用）
 function drawEmotionUI() {
-  let sx = ying_sliderX;
-  let sy = ying_sliderY;
-  let sw = ying_sliderW;
-  let sh = ying_sliderH;
-  let thumbX = sx + ying_sliderValue * sw;
-  let thumbY = sy + sh / 2;
-
-  // 标题
-  fill(200);
-  noStroke();
-  textSize(13);
-  textAlign(LEFT, BASELINE);
-  text('Mood', sx, sy - 10);
-
-  // 轨道背景
-  fill(60, 60, 70);
-  noStroke();
-  rectMode(CORNER);
-  rect(sx, sy, sw, sh, sh / 2);
-
-  // 已选部分高亮
-  fill(ying_currentColor[0], ying_currentColor[1], ying_currentColor[2]);
-  rect(sx, sy, ying_sliderValue * sw, sh, sh / 2);
-
-  // 滑块
-  fill(255);
-  noStroke();
-  circle(thumbX, thumbY, 22);
-
-  // 两端标签
-  fill(180);
-  textSize(11);
-  textAlign(LEFT, TOP);
-  text('Unhappy', sx, sy + sh + 6);
-  textAlign(RIGHT, TOP);
-  text('Happy', sx + sw, sy + sh + 6);
-
-  textAlign(LEFT, BASELINE);
+  // This function stays as a no-op so older sketches can still call it safely.
 }
