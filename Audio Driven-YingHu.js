@@ -182,7 +182,7 @@ function drawEmotionUI() {
   noStroke();
   textSize(13);
   textAlign(LEFT, BASELINE);
-  text('愉快度', sx, sy - 10);
+  text('Mood', sx, sy - 10);
 
   // 轨道背景
   fill(60, 60, 70);
@@ -203,9 +203,9 @@ function drawEmotionUI() {
   fill(180);
   textSize(11);
   textAlign(LEFT, TOP);
-  text('非常不愉快', sx, sy + sh + 6);
+  text('Unhappy', sx, sy + sh + 6);
   textAlign(RIGHT, TOP);
-  text('非常愉快', sx + sw, sy + sh + 6);
+  text('Happy', sx + sw, sy + sh + 6);
 
   textAlign(LEFT, BASELINE);
 }
