@@ -50,14 +50,28 @@ class PerlinRandomMechanic {
     // Map the shared emotion slider into two visual tendencies.
     // Unpleasant states amplify detail noise, making the surface sharper and less stable.
     // Pleasant states amplify macro flow and pulse, making the surface feel smoother and more open.
-    let unpleasantAmount = map(this.emotionValue, -1, 1, 1.45, 0.65);
-    let pleasantAmount = map(this.emotionValue, -1, 1, 0.75, 1.3);
+   
+    // Split the slider into two clear emotional directions.
+    // unpleasant = 1 on the left side, pleasant = 1 on the right side.
+    let unpleasant = map(this.emotionValue, -1, 1, 1, 0);
+    let pleasant = map(this.emotionValue, -1, 1, 0, 1);
 
-    let macroDeformation = map(macroNoise, 0, 1, -45, this.deformationStrength) * pleasantAmount;
-    let detailDeformation = map(detailNoise, 0, 1, -this.detailStrength, this.detailStrength) * unpleasantAmount;
-    let pulseDeformation = pulse * this.pulseStrength * pleasantAmount;
+    // Pleasant states create broader, smoother swelling.
+    let macroRange = map(pleasant, 0, 1, 90, 230);
+    let macroDeformation = map(macroNoise, 0, 1, -25, macroRange);
+
+    // Unpleasant states add sharper outward ridges.
+    // This is mostly positive so it remains visible even with the sphere's minimum-radius guardrail.
+    let detailCentered = map(detailNoise, 0, 1, -1, 1);
+    let detailDeformation = detailCentered * this.detailStrength * map(unpleasant, 0, 1, 0.45, 3.4);
+
+    // Extra ridge layer makes negative emotion visibly more unstable and spiky.
+    let ridgeDeformation = pow(detailNoise, 3) * map(unpleasant, 0, 1, 0, 95);
+
+    // Pleasant states breathe more gently and openly.
+    let pulseDeformation = pulse * this.pulseStrength * map(pleasant, 0, 1, 0.55, 2.4);
 
 
-    return macroDeformation + detailDeformation + pulseDeformation;
+    return macroDeformation + detailDeformation + pulseDeformation + ridgeDeformation ;
   }
 }
