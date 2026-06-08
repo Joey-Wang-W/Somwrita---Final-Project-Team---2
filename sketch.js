@@ -15,8 +15,6 @@ function setup() {
   
   // Enable antialiasing for smooth line rendering edges
   setAttributes('antialias', true); 
-
-    textFont(ying_font);
   
   // Instantiate the sphere object
   myPlanet = new OscilloscopeSphere();
@@ -52,12 +50,6 @@ function draw() {
   
 }
 
-let ying_font;
-
-function preload() {
-  preloadAudio();
-  ying_font = loadFont('https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf');
-}
 
 function mousePressed() {
   triggerHeartbeatPulse();
