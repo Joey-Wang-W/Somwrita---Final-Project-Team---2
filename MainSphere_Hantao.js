@@ -15,9 +15,11 @@ class OscilloscopeSphere {
     this.timeOffset = 0;
   }
 
-  update() {
-    // 演变流淌速度：增加会让波动变快，降低则会平缓
-    this.timeOffset += 0.007;
+  // update 接收来自交互文件的能量活跃度系数 activity
+  update(activity) {
+    // 演变流淌速度：将原本的 0.007 乘以活跃度系数
+    // 平时处于 10% 状态时，流速仅为 0.0007，球体几乎静止；全速运转时恢复为 0.007 甚至更高
+    this.timeOffset += 0.007 * activity;
   }
 
   display() {
@@ -86,6 +88,11 @@ class OscilloscopeSphere {
           let bigWaves = noiseCache[i][j];
           // 叠加当前层的专属 Offset，实现完美的法线向外发光膨胀
           let currentRadius = this.radius + bigWaves + currentOffset;
+
+          // 强制防线：确保任何时候绝对不会向内塌陷进基础半径
+          if (currentRadius < this.radius) {
+            currentRadius = this.radius;
+          }
 
           // 计算最终渲染的 3D 空间坐标
           let x = currentRadius * xDir;

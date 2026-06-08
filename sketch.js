@@ -1,4 +1,6 @@
 let myPlanet;
+// 引入增量角度变量，防止动态改变自转速度时画面产生瞬间旋转跳变的 Bug
+let hantao_rotationAngle = 0; 
 
 function setup() {
   // 创建 WEBGL 3D 渲染画布
@@ -18,10 +20,17 @@ function draw() {
 
   // 倾斜相机视角，营造全息等高线沙盘的俯瞰透视感
   rotateX(PI / 3.5);
-  // 场景自转速度：调整 0.001 可以改变整个球体的自转快慢
-  rotateY(frameCount * 0.001); 
+  
+  // 获取过去 10 秒鼠标轨迹累计算出来的全局活跃度系数 (0.1 ~ 1.0+)
+  let currentActivity = getHantaoInteraction();
 
-  myPlanet.update();
+  // 根据当前的活跃度，动态累加旋转角度（平时速度只有原本的 10%）
+  hantao_rotationAngle += 0.001 * currentActivity;
+  rotateY(hantao_rotationAngle); 
+
+  // 驱动球体数据演变（将活跃度喂给时间轴，控制地形波动速度）
+  myPlanet.update(currentActivity);
+  // 渲染球体
   myPlanet.display();
 }
 
