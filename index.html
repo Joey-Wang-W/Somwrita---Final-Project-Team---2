@@ -13,6 +13,29 @@
 </head>
 
 <body>
+    <!-- Shared emotion input UI.
+     The slider outputs one project-wide emotionValue:
+     -1 = unpleasant, 0 = neutral, 1 = pleasant. -->
+<div id="emotion-ui">
+    <div id="emotion-title">Current Feeling</div>
+    <div id="emotion-label">Neutral</div>
+
+    <!-- This range input is read in sketch.js and mapped into emotionValue. -->
+    <input
+        id="emotion-slider"
+        type="range"
+        min="-1"
+        max="1"
+        step="0.01"
+        value="0"
+    >
+
+    <div id="emotion-scale">
+        <span>Unpleasant</span>
+        <span>Pleasant</span>
+    </div>
+</div>
+
     <script src="perlin-random-Yidan.js"></script>
     <script src="MainSphere_Hantao.js"></script>
     <script src="Interaction_Hantao.js"></script>

@@ -16,12 +16,19 @@ class PerlinRandomMechanic {
     this.deformationStrength = random(90, 170);
     this.detailStrength = random(16, 42);
     this.pulseStrength = random(8, 24);
+
+    // Stores the shared emotion value from sketch.js.
+    // -1 increases unstable detail noise, 1 increases smoother macro flow.
+    this.emotionValue = 0;
   }
 
-  update(activity = 1) {
+  update(activity = 1, emotionValue = 0) {
     // Hantao's interaction activity speeds up the organic noise field.
     let activityBoost = constrain(activity, 0.25, 3.0);
     this.time += this.noiseSpeed * activityBoost;
+    
+    // Store the shared emotion value so getDeformation() can shape the noise response.
+    this.emotionValue = emotionValue;
   }
 
   getDeformation(xDir, yDir, zDir) {
@@ -40,9 +47,16 @@ class PerlinRandomMechanic {
     // Time-based pulse makes the surface feel alive while still driven by this mechanic.
     let pulse = sin(this.time * TWO_PI * 0.7 + yDir * PI);
 
-    let macroDeformation = map(macroNoise, 0, 1, -45, this.deformationStrength);
-    let detailDeformation = map(detailNoise, 0, 1, -this.detailStrength, this.detailStrength);
-    let pulseDeformation = pulse * this.pulseStrength;
+    // Map the shared emotion slider into two visual tendencies.
+    // Unpleasant states amplify detail noise, making the surface sharper and less stable.
+    // Pleasant states amplify macro flow and pulse, making the surface feel smoother and more open.
+    let unpleasantAmount = map(this.emotionValue, -1, 1, 1.45, 0.65);
+    let pleasantAmount = map(this.emotionValue, -1, 1, 0.75, 1.3);
+
+    let macroDeformation = map(macroNoise, 0, 1, -45, this.deformationStrength) * pleasantAmount;
+    let detailDeformation = map(detailNoise, 0, 1, -this.detailStrength, this.detailStrength) * unpleasantAmount;
+    let pulseDeformation = pulse * this.pulseStrength * pleasantAmount;
+
 
     return macroDeformation + detailDeformation + pulseDeformation;
   }
