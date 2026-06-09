@@ -25,6 +25,29 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ---
 
+## Interaction Guide
+
+### Interaction Guide
+
+1. **Click anywhere on the canvas to begin the experience.**
+   The first click activates the audio system and starts the emotional soundscape. The heartbeat and ambient sound layers will begin playing and driving the ecosystem.
+
+2. **Adjust the emotion slider at the bottom of the screen.**
+   Move the slider between **Unpleasant**, **Neutral**, and **Pleasant** emotional states. Different emotional positions gradually blend different heartbeat rhythms, background soundscapes, colours, and visual behaviours.
+
+3. **Move the mouse slowly or rapidly across the screen.**
+   The system continuously records your movement patterns. Smooth and gentle motions create calmer responses, while fast or erratic movements introduce instability and turbulence into the ecosystem.
+
+4. **Observe the ecosystem as it evolves over time.**
+   Even without interaction, the emotional landscape continuously grows, transforms, contracts, and expands through its time-based lifecycle.
+
+5. **Experiment with different combinations of emotion and movement.**
+   Try changing the emotion slider while moving the mouse or triggering heartbeat pulses. Each combination creates a unique emotional ecosystem shaped by sound, time, interaction, and organic motion.
+
+
+
+---
+
 ## References / Inspirations  
 
 ![Inspiration](readmeImages/190e5227fbf7f904f8055828fb691cc3.jpg)
@@ -67,7 +90,7 @@ The emotional slider ranges from -1 to 1 and blends between three emotional soun
 To transform sound into visual behaviour, the system performs real-time audio analysis using both Amplitude analysis and FFT spectrum analysis. The heartbeat signal is analyzed continuously to generate an activity value that can be shared with the visual system. Low-frequency energy, especially bass frequencies associated with heartbeat rhythms, is given the strongest influence. This process transforms audio into a dynamic emotional force that drives the behaviour of the ecosystem.
 
 ### Interactive Heartbeat Feedback
-User interaction directly influences the emotional system. The first click activates the audio environment and begins playback. Afterwards, clicking near the central sphere triggers an additional heartbeat pulse. These interactions temporarily increase the system’s activity level, causing stronger visual reactions and reinforcing the idea that emotions can be externally stimulated and amplified through interaction.
+User interaction directly influences the emotional system. The first click activates the audio environment and begins playback. These interactions temporarily increase the system’s activity level, causing stronger visual reactions and reinforcing the idea that emotions can be externally stimulated and amplified through interaction.
 
 
 ### External references:
