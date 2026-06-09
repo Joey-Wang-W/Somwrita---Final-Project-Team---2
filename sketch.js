@@ -69,11 +69,16 @@ function draw() {
 
   yidanPerlinMechanic.update(currentActivity, emotionValue);
 
+  applyJadeColour();
+
   // Increment rotation angle based on current activity scalar
   hantao_rotationAngle += 0.001 * currentActivity;
+  hantao_rotationAngle += jade_timeScale * 0.0006;
 
   // Apply Y-axis rotation transformation
   rotateY(hantao_rotationAngle);
+
+  scale(jade_radiusScale); 
 
   // Draw Yidan's noisy emotional field inside the same 3D space as the sphere.
   // This follows the Week 11 noisy-shapes idea, but adapts it into WEBGL.
@@ -91,6 +96,8 @@ function draw() {
 
   // Render the sphere geometry
   myPlanet.display();
+
+  displayJadeLayer();
 
 
 }
