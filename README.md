@@ -58,6 +58,32 @@ On the interactive level, users can click the main object with a mouse to genera
 
 ## 2. Time-based Mechanism (Jade Gu)
 
+**File:** `Time-based-Jade.js`
+
+---
+
+## Techniques
+
+**Time as the sole driver**  
+All visual changes are derived from `millis()`, p5.js's elapsed-time function. There is no randomness, no audio analysis, and no direct user input beyond the shared emotion slider. Phase transitions, rotation speed, contraction depth, halo pulse, and particle orbit all follow deterministic mathematical functions of time.
+
+**Phase interpolation**  
+Eight named phases define target values for radius scale, rotation speed, halo appearance, and particle density. Each frame, the module computes a blend factor between the current phase and the next using a 5th-order smootherstep curve, which eliminates velocity snapping at transition endpoints. All numeric fields are linearly interpolated across this blend.
+
+**sin/cos multi-frequency composition**  
+Instead of Perlin noise (owned by a different team member), variation is achieved by summing six sine waves with incommensurable frequency ratios. This produces smooth, non-repeating variation that visually resembles organic noise without using `noise()`.
+
+**Global variable bridge**  
+Because `MainSphere_Hantao.js` is owned by another team member and cannot be modified, this module communicates with the main sketch by writing two global variables each frame — `jade_radiusScale` and `jade_timeScale` — which `sketch.js` reads to apply `scale()` and adjust the rotation accumulator. This keeps the module fully self-contained.
+
+**Additive layering**  
+The halo rings and particle ring are drawn in the same WEBGL coordinate space as the sphere, after `myPlanet.display()`. They do not replace any existing geometry — Yidan's Perlin deformation and Hantao's rotation system continue to run unmodified underneath.
+
+---
+
+## Mechanic Ownership
+
+**Jade — Time-based**  
 Uses `millis()` as the sole time source to drive an 8-phase lifecycle. Each phase defines a target radius scale, rotation speed, halo ring appearance, and orbital particle ring density. Values interpolate smoothly between phases. The shared `emotionValue` slider modulates phase duration, contraction depth, rotation speed, and overall brightness:
 
 - `-1` unpleasant → faster cycle, tighter contraction, dimmer halo
@@ -65,6 +91,35 @@ Uses `millis()` as the sole time source to drive an 8-phase lifecycle. Each phas
 - `+1` pleasant → slower cycle, gentle expansion, brighter halo
 
 Two globals (`jade_radiusScale`, `jade_timeScale`) are written each frame for `sketch.js` to consume via `scale()` and the rotation accumulator.
+
+---
+
+## AI Acknowledgement
+
+`Time-based-Jade.js` was generated with the help of **Claude (Anthropic)**. Claude was used to write and iterate on the phase interpolation system, the sin-based noise replacement, the global variable bridge pattern, and the halo/particle rendering functions. The visual concept, phase structure, `emotionValue` mapping, and all integration decisions were provided by the creator.
+
+This is also noted in the file header comment inside `Time-based-Jade.js`.
+
+---
+
+## External References
+
+- **Smootherstep easing function** — Ken Perlin's 5th-order improvement over smoothstep, used for phase transition blending.  
+  Reference: https://en.wikipedia.org/wiki/Smoothstep#Variations
+
+- **Heartbeat_Topography reference series** — visual inspiration for the 8 phase shapes.  
+  Source: 小红书 @18920731411
+
+---
+
+## Interaction Instructions
+
+1. Open the sketch in a browser and click anywhere on the canvas to start the audio.
+2. Use the emotion slider at the bottom of the screen:
+   - Drag left toward **Unpleasant** — the sphere contracts, rotates faster, and the halo dims. The phase cycle accelerates.
+   - Leave centred at **Neutral** — steady baseline rhythm.
+   - Drag right toward **Pleasant** — the sphere expands gently, rotation slows, and the halo brightens. The phase cycle lengthens.
+3. Watch the outer rings and particle orbit — these change colour and density automatically as the time-based phases cycle, approximately every 8–14 seconds depending on the emotion setting.
 
 ---
 
@@ -184,55 +239,3 @@ Together, they create a dynamic balance between order and chaos. The project is 
 
 ---
 
-# Time-based Mechanic
-
-**Creator:** Jade  
-**File:** `Time-based-Jade.js`
-
----
-
-## Techniques
-
-**Time as the sole driver**  
-All visual changes are derived from `millis()`, p5.js's elapsed-time function. There is no randomness, no audio analysis, and no direct user input beyond the shared emotion slider. Phase transitions, rotation speed, contraction depth, halo pulse, and particle orbit all follow deterministic mathematical functions of time.
-
-**Phase interpolation**  
-Eight named phases define target values for radius scale, rotation speed, halo appearance, and particle density. Each frame, the module computes a blend factor between the current phase and the next using a 5th-order smootherstep curve, which eliminates velocity snapping at transition endpoints. All numeric fields are linearly interpolated across this blend.
-
-**sin/cos multi-frequency composition**  
-Instead of Perlin noise (owned by a different team member), variation is achieved by summing six sine waves with incommensurable frequency ratios. This produces smooth, non-repeating variation that visually resembles organic noise without using `noise()`.
-
-**Global variable bridge**  
-Because `MainSphere_Hantao.js` is owned by another team member and cannot be modified, this module communicates with the main sketch by writing two global variables each frame — `jade_radiusScale` and `jade_timeScale` — which `sketch.js` reads to apply `scale()` and adjust the rotation accumulator. This keeps the module fully self-contained.
-
-**Additive layering**  
-The halo rings and particle ring are drawn in the same WEBGL coordinate space as the sphere, after `myPlanet.display()`. They do not replace any existing geometry — Yidan's Perlin deformation and Hantao's rotation system continue to run unmodified underneath.
-
----
-
-## AI Acknowledgement
-
-`Time-based-Jade.js` was generated with the help of **Claude (Anthropic)**. Claude was used to write and iterate on the phase interpolation system, the sin-based noise replacement, the global variable bridge pattern, and the halo/particle rendering functions. The visual concept, phase structure, `emotionValue` mapping, and all integration decisions were provided by the creator.
-
-This is also noted in the file header comment inside `Time-based-Jade.js`.
-
----
-
-## External References
-
-- **Smootherstep easing function** — Ken Perlin's 5th-order improvement over smoothstep, used for phase transition blending.  
-  Reference: https://en.wikipedia.org/wiki/Smoothstep#Variations
-
-- **Heartbeat_Topography reference series** — visual inspiration for the 8 phase shapes.  
-  Source: 小红书 @18920731411
-
----
-
-## Interaction Instructions
-
-1. Open the sketch in a browser and click anywhere on the canvas to start the audio.
-2. Use the emotion slider at the bottom of the screen:
-   - Drag left toward **Unpleasant** — the sphere contracts, rotates faster, and the halo dims. The phase cycle accelerates.
-   - Leave centred at **Neutral** — steady baseline rhythm.
-   - Drag right toward **Pleasant** — the sphere expands gently, rotation slows, and the halo brightens. The phase cycle lengthens.
-3. Watch the outer rings and particle orbit — these change colour and density automatically as the time-based phases cycle, approximately every 8–14 seconds depending on the emotion setting.
