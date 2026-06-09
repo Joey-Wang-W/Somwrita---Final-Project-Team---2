@@ -42,11 +42,9 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 5. **Experiment with different combinations of emotion and movement.**
    Try changing the emotion slider while moving the mouse or triggering heartbeat pulses. Each combination creates a unique emotional ecosystem shaped by sound, time, interaction, and organic motion.
 
-
-
 ---
 
-## References / Inspirations  
+## Inspirations  
 
 ![Inspiration](readmeImages/190e5227fbf7f904f8055828fb691cc3.jpg)
 ![Inspiration2](readmeImages/284f1b6b18d22715291fa3df9608ac2f.jpg)
@@ -95,9 +93,6 @@ User interaction directly influences the emotional system. The first click activ
 - p5.Amplitude reference: https://p5js.org/reference/p5.sound/p5.Amplitude/
 - p5.FFT reference: https://p5js.org/reference/p5.sound/p5.FFT/
 - userStartAudio reference: https://p5js.org/reference/p5/userStartAudio/
-
-
-
 
 ---
 
