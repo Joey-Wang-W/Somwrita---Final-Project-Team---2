@@ -56,7 +56,7 @@ On the interactive level, users can click the main object with a mouse to genera
 
 ---
 
-## 2. Time-based Mechanism (Jade Gu)
+## 2. Time-based Mechanism (Jade Gu: hagu0731)
 
 **File:** `Time-based-Jade.js`
 
