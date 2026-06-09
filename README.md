@@ -67,7 +67,7 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ---
 
-## 1. Audio-driven Mechanism (Ying Hu)
+## 1. Audio-driven Mechanism (Ying Hu: yihu0384)
 
 ### AI Usage Statement
 This file was updated with the help of Codex. Codex helped structure the crossfade and FFT/Amplitude analysis.
@@ -152,7 +152,7 @@ This is also noted in the file header comment inside `Time-based-Jade.js`.
 
 ---
 
-## 3. Perlin Noise & Randomness (Yidan Wang)
+## 3. Perlin Noise & Randomness (Yidan Wang: ywan0254)
 ### AI Usage Statement
 
 Some parts of this mechanism were developed with the assistance of AI tools. AI was used to help refine the structure of the Perlin noise system, suggest clearer code comments, and improve the written explanation for the README. The final creative direction, visual decisions, code selection, testing, and integration were reviewed and adjusted by the team member.
@@ -250,7 +250,7 @@ When the emotion slider is close to neutral, the particles stay subtle. When the
 
 ---
 
-## 4. User Interaction Mechanism (Hantao Xu)
+## 4. User Interaction Mechanism (Hantao Xu: haxu0278)
 
 ### Mechanic Description
 Completed the baseline 3D structural rendering code for the core planet geometry (`MainSphere_Hantao.js`) and designed the global interaction pipeline (`Interaction_Hantao.js`). The primary responsibility of this interaction mechanic is to unify all major system variations—such as rotation velocity and wave deformation frequencies—under the centralized control of the shared HTML slider, establishing a single source of global kinetic modulation.
