@@ -17,7 +17,11 @@ let ying_currentColor = [80, 180, 255];
 let ying_pan = 0;
 let ying_centroid = 0;
 
-// -1 = unpleasant, 0 = neutral, 1 = pleasant.
+// Emotion stops for the shared slider.
+// Each stop contains two audio layers:
+// 1. heartbeatFile: the main sound, kept loud and used for analysis
+// 2. backgroundFile: the mood layer, kept quieter so the heartbeat stays clear
+// Slider values: -1 = unpleasant, 0 = neutral, 1 = pleasant.
 const ying_emotionStops = [
   {
     name: 'unpleasant',
@@ -45,9 +49,12 @@ const ying_emotionStops = [
   }
 ];
 
+// Background music supports the emotion but stays lower in the mix.
 const ying_heartbeatVolume = 1.0;
 const ying_backgroundVolume = 0.22;
 
+// Called from sketch.js preload().
+// Loading all sound files early prevents playback/analysis from starting before
 function preloadAudio() {
   for (const stop of ying_emotionStops) {
     loadYingSound(stop);
@@ -55,8 +62,6 @@ function preloadAudio() {
 }
 
 function setupAudio() {
-  // Keep preloadAudio optional so this module still works if sketch.js does not
-  // define a p5 preload() hook.
   for (const stop of ying_emotionStops) {
     if (!ying_sounds[stop.name]?.heartbeat || !ying_sounds[stop.name]?.background) {
       loadYingSound(stop);
@@ -65,10 +70,12 @@ function setupAudio() {
 
   ying_fft = new p5.FFT(0.82, 64);
   ying_amplitude = new p5.Amplitude(0.82);
+
   updateAudioMix();
 }
 
 function loadYingSound(stop) {
+  // Store the two layers together under the emotion name.
   ying_sounds[stop.name] = {
     heartbeat: loadSound(stop.heartbeatFile, () => {
       if (ying_started) {
@@ -88,6 +95,7 @@ function loadYingSound(stop) {
 function prepareSingleYingSound(sound) {
   if (!sound || !sound.isLoaded()) return false;
 
+  // Start looping only once. The first audible volume is applied by updateAudioMix().
   if (!sound.isPlaying()) {
     sound.setVolume(0);
     sound.loop();
@@ -100,6 +108,7 @@ function prepareYingSound(stop) {
   const soundGroup = ying_sounds[stop.name];
   if (!soundGroup) return false;
 
+  // A mood can still begin if one layer is ready slightly before the other.
   const heartbeatReady = prepareSingleYingSound(soundGroup.heartbeat);
   const backgroundReady = prepareSingleYingSound(soundGroup.background);
 
@@ -109,6 +118,8 @@ function prepareYingSound(stop) {
 function setYingGroupVolume(soundGroup, weight) {
   if (!soundGroup) return;
 
+  // weight comes from the emotion slider crossfade.
+  // The heartbeat uses full volume, while the background layer is scaled down.
   if (soundGroup.heartbeat) {
     soundGroup.heartbeat.setVolume(weight * ying_heartbeatVolume, 0.18);
     soundGroup.heartbeat.pan(ying_pan);
@@ -125,8 +136,7 @@ function getYingHeartbeat(stopName) {
 }
 
 function startYingAudio() {
-  // Calling this again from mousePressed is intentional: browsers usually need
-  // a user gesture before the audio context is allowed to make sound.
+  // Browsers require a user gesture before the audio context is allowed to make sound.
   userStartAudio();
 
   for (const stop of ying_emotionStops) {
@@ -144,15 +154,18 @@ function startYingAudio() {
 }
 
 function yingSmoothstep(t) {
+  // Smooth crossfade curve, softer than a straight linear transition.
   t = constrain(t, 0, 1);
   return t * t * (3 - 2 * t);
 }
 
 function getYingEmotionValue() {
+
   if (typeof emotionValue === 'number') {
     return constrain(emotionValue, -1, 1);
   }
 
+  // Fallback: read directly from the HTML slider if the global is unavailable.
   const slider = document.getElementById('emotion-slider');
   if (slider) {
     return constrain(Number(slider.value), -1, 1);
@@ -164,10 +177,12 @@ function getYingEmotionValue() {
 function getYingMix(v) {
   const weights = {};
 
+  // Initialize every emotion to silence before calculating the active crossfade.
   for (let i = 0; i < ying_emotionStops.length; i++) {
     weights[ying_emotionStops[i].name] = 0;
   }
 
+  // Clamp beyond the slider ends to the first/last emotion.
   if (v <= ying_emotionStops[0].value) {
     weights[ying_emotionStops[0].name] = 1;
     return weights;
@@ -179,6 +194,8 @@ function getYingMix(v) {
     return weights;
   }
 
+  // Find which two neighbouring emotions the slider is between,
+  // then crossfade their weights smoothly.
   for (let i = 0; i < ying_emotionStops.length - 1; i++) {
     const left = ying_emotionStops[i];
     const right = ying_emotionStops[i + 1];
@@ -196,6 +213,7 @@ function getYingMix(v) {
 }
 
 function getWeightedAudioProperty(weights, key) {
+  // Blend numeric emotion settings, such as boost, using the same crossfade weights.
   let total = 0;
 
   for (const stop of ying_emotionStops) {
@@ -206,6 +224,7 @@ function getWeightedAudioProperty(weights, key) {
 }
 
 function getWeightedColor(weights) {
+  // Current color can be shared with visual code if needed.
   const color = [0, 0, 0];
 
   for (const stop of ying_emotionStops) {
@@ -219,6 +238,7 @@ function getWeightedColor(weights) {
 }
 
 function getDominantYingSound(weights) {
+  
   let strongestStop = ying_emotionStops[0];
   let strongestWeight = -1;
 
@@ -236,16 +256,18 @@ function getDominantYingSound(weights) {
 function updateAudioMix() {
   const emotion = getYingEmotionValue();
   const weights = getYingMix(emotion);
-  // Course reference: map a control value to pan().
+
   // Here the shared emotion slider replaces mouseX: unpleasant leans left,
   // neutral stays centred, and pleasant leans right.
   ying_pan = map(emotion, -1, 1, -0.35, 0.35);
 
   for (const stop of ying_emotionStops) {
+    // Before the first click, all target weights are forced to 0 so nothing plays.
     const targetWeight = ying_started ? weights[stop.name] || 0 : 0;
     setYingGroupVolume(ying_sounds[stop.name], targetWeight);
   }
 
+  // keeping background music out of the main activity signal.
   const dominantSound = getDominantYingSound(weights);
   if (dominantSound) {
     ying_fft.setInput(dominantSound);
@@ -257,6 +279,7 @@ function updateAudioMix() {
 }
 
 function getYingAudio() {
+  // Until the user clicks, keep the audio contribution calm and silent.
   if (!ying_started) {
     updateAudioMix();
     ying_audioActivity = lerp(ying_audioActivity, 0.02, 0.08);
@@ -266,7 +289,7 @@ function getYingAudio() {
   const weights = updateAudioMix();
 
   let spectrum = ying_fft ? ying_fft.analyze() : [];
-  // Course reference: combine amplitude analysis with FFT frequency bands.
+
   // The heartbeat remains the analysed source, so background music supports
   // the mood without overpowering the visual reaction.
   const rms = ying_amplitude ? ying_amplitude.getLevel() : 0;
@@ -275,16 +298,21 @@ function getYingAudio() {
   const treble = ying_fft ? ying_fft.getEnergy('treble') / 255 : 0;
   ying_centroid = ying_fft ? constrain(ying_fft.getCentroid() / 22050, 0, 1) : 0;
 
+  // Combine overall loudness and selected frequency bands into one activity value.
+  // Bass is weighted strongly because heartbeat energy usually lives there.
   const spectralBrightness = treble * ying_centroid;
   const rawEnergy = rms * 0.45 + bass * 0.35 + lowMid * 0.15 + spectralBrightness * 0.05;
   const boost = getWeightedAudioProperty(weights, 'boost');
   const targetActivity = constrain(map(rawEnergy * boost, 0, 1, 0.02, 3.0), 0.02, 3.0);
 
+  // Smooth the activity so the sphere pulses organically instead of jittering.
   ying_audioActivity = lerp(ying_audioActivity, targetActivity, 0.12);
   return ying_audioActivity;
 }
 
 function triggerHeartbeatPulse() {
+  // First click starts the audio; later clicks add an extra pulse if the user
+  // clicks near the central sphere.
   startYingAudio();
 
   const cx = width / 2;
@@ -296,5 +324,6 @@ function triggerHeartbeatPulse() {
 }
 
 function drawEmotionUI() {
-  // This function stays as a no-op so older sketches can still call it safely.
+  // The visible emotion UI lives in index.html.
+  // This no-op keeps compatibility with older sketches that may still call it.
 }
