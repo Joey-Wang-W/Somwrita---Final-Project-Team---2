@@ -252,11 +252,28 @@ When the emotion slider is close to neutral, the particles stay subtle. When the
 
 ## 4. User Interaction Mechanism (Hantao Xu: haxu0278)
 
-The user interaction mechanism moves beyond basic point-to-point tracking by implementing a memory-based trajectory system. Using mouse input, the program continuously records the movement history of the user over a rolling ten-second window. The central digital ecosystem responds to the overall shape and intensity of this recent history rather than just the current cursor position. 
+### Mechanic Description
+Completed the baseline 3D structural rendering code for the core planet geometry (`MainSphere_Hantao.js`) and designed the global interaction pipeline (`Interaction_Hantao.js`). The primary responsibility of this interaction mechanic is to unify all major system variations—such as rotation velocity and wave deformation frequencies—under the centralized control of the shared HTML slider, establishing a single source of global kinetic modulation.
 
-Smooth and continuous gestures will calm the generative environment and produce soft visual pulsations. On the other hand, erratic and sharp movements leave lasting disruptions in the data space, causing the surrounding Perlin noise terrain to become chaotic and unstable.
+### Inspiration
+The modular architecture and the unified slider-control method are inspired by analog instrumentation and hardware oscilloscopes, where a single master dial calibrates the entire geometric readout. This design approach bridges independent script files with a singular control axis, successfully translating an abstract emotional state into a synchronized, objective physical animation profile.
 
- This approach serves as a metaphor for how our present emotional states are constantly shaped by the lingering effects of our immediate past.It positions the user as an active catalyst whose behavioral history directly molds the stability and flow of the digital topography.
+### Techniques & Code Overview
+* **p5.js Techniques Implemented:** Dynamic 1D domain mapping (`map()`), linear interpolation algorithms (`lerp()`), and global Document Object Model (DOM) event integration (`document.getElementById`).
+* **Implementation & Key Decisions:** To prevent harsh visual snapping when users jump the slider instantly across extreme values, the module passes the raw values through a low-pass linear interpolation buffer. It converts blocky, discrete input data into a smooth geometric curve using a fixed step rate ($t = 0.05$). The script exposes a standardized interface function `getHantaoSliderMultiplier()`, ensuring zero architectural interference with teammate logic while successfully broadcasting velocity updates across the entire 3D rendering pipeline in `sketch.js`.
+
+### Interaction Instructions
+* Locate the **"Current Feeling"** slider at the side/bottom UI panel of the web page.
+* **Drag the slider to the left (towards "Unpleasant"):** The entire visual system decelerates smoothly into near-stasis. The internal planet core waves freeze, and the external ring structures/heartbeat contractions drop to a minimal, dormant baseline rhythm.
+* **Drag the slider to the right (towards "Pleasant"):** The clock speeds up. The planet core's rotation scales up to full speed, and the external ring systems shift into high-frequency oscillation, maximizing visual dynamism.
+
+### AI Acknowledgement
+* **Tool Used:** Gemini (Google AI)
+* **Scope & Purpose:** Assisted in designing the software decoupling layer for the global multi-file pipeline, setting up local timeline accumulators to replace absolute system clocks, and establishing linear interpolation formulas within `Interaction_Hantao.js`.
+* **Technical Functionality:** The AI helped optimize the variable scopes across files to maintain modular integrity. It provided the structure for blending multiple animation modifiers together smoothly, ensuring that updating teammate parameters did not trigger matrix phase-shifting or rendering loop runtime crashes.
+
+### External References
+* The interpolation filtering relies on the native p5.js `lerp()` function, a standard numerical implementation used to smooth discrete data steps across animation frames. (Reference documentation: [p5.js lerp reference](https://p5js.org/reference/p5/lerp/)).
 
 ---
 
