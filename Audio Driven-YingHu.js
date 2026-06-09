@@ -65,7 +65,7 @@ function setupAudio() {
 
   ying_fft = new p5.FFT(0.82, 64);
   ying_amplitude = new p5.Amplitude(0.82);
-  startYingAudio();
+  updateAudioMix();
 }
 
 function loadYingSound(stop) {
@@ -88,8 +88,8 @@ function loadYingSound(stop) {
 function prepareSingleYingSound(sound) {
   if (!sound || !sound.isLoaded()) return false;
 
-  sound.setVolume(0);
   if (!sound.isPlaying()) {
+    sound.setVolume(0);
     sound.loop();
   }
 
@@ -242,7 +242,8 @@ function updateAudioMix() {
   ying_pan = map(emotion, -1, 1, -0.35, 0.35);
 
   for (const stop of ying_emotionStops) {
-    setYingGroupVolume(ying_sounds[stop.name], weights[stop.name] || 0);
+    const targetWeight = ying_started ? weights[stop.name] || 0 : 0;
+    setYingGroupVolume(ying_sounds[stop.name], targetWeight);
   }
 
   const dominantSound = getDominantYingSound(weights);
@@ -256,6 +257,12 @@ function updateAudioMix() {
 }
 
 function getYingAudio() {
+  if (!ying_started) {
+    updateAudioMix();
+    ying_audioActivity = lerp(ying_audioActivity, 0.02, 0.08);
+    return ying_audioActivity;
+  }
+
   const weights = updateAudioMix();
 
   let spectrum = ying_fft ? ying_fft.analyze() : [];
