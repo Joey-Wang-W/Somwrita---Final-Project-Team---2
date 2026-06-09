@@ -61,18 +61,27 @@ function draw() {
   // Tilt camera on X-axis at a fixed angle for a perspective view
   rotateX(PI / 3.5);
 
-  // 🔥 UPDATED: Fetch the interpolated, ultra-smooth speed multiplier from Hantao's script
+  // Fetch the interpolated, ultra-smooth speed multiplier from Hantao's script
   let emotionMultiplier = getHantaoSliderMultiplier();
 
   // Track activity levels for other teammates' background mechanics
   let currentActivity = max(getHantaoInteraction(), getYingAudio());
+  
+  // Enforce slider multiplier on Yidan's perlin mechanic to allow freezing at 0
   yidanPerlinMechanic.update(currentActivity * emotionMultiplier, emotionValue);
 
-  // Increment rotation angle based on Hantao's smooth slider multiplier
+  // 1. Keep Jade's colour blending mechanic
+  applyJadeColour();
+
+  // 2. Drive base rotation using Hantao's slider, but stack Jade's time scaling on top
   hantao_rotationAngle += 0.001 * emotionMultiplier;
+  hantao_rotationAngle += jade_timeScale * 0.0006;
 
   // Apply Y-axis rotation transformation
   rotateY(hantao_rotationAngle);
+
+  // 3. Keep Jade's radius scaling mechanic
+  scale(jade_radiusScale); 
 
   // Draw Yidan's noisy emotional field inside the same 3D space as the sphere.
   yidanPerlinMechanic.displayBackground();
@@ -88,6 +97,9 @@ function draw() {
 
   // Render the sphere geometry
   myPlanet.display();
+
+  // 4. Keep Jade's foreground layer rendering
+  displayJadeLayer();
 }
 
 
