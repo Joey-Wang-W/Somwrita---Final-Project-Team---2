@@ -34,7 +34,7 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
    Move the slider between **Unpleasant**, **Neutral**, and **Pleasant** emotional states. Different emotional positions gradually blend different heartbeat rhythms, background soundscapes, colours, and visual behaviours.
 
 3. **Move the mouse slowly or rapidly across the screen.**
-   The system continuously records your movement patterns. Smooth and gentle motions create calmer responses, while fast or erratic movements introduce instability and turbulence into the ecosystem.
+   Click the middle mouse button to zoom in or out on the heart. The system continuously records your movement patterns. Smooth and gentle motions create calmer responses, while fast or erratic movements introduce instability and turbulence into the ecosystem.
 
 4. **Observe the ecosystem as it evolves over time.**
    Even without interaction, the emotional landscape continuously grows, transforms, contracts, and expands through its time-based lifecycle.
