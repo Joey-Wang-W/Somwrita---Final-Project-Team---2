@@ -82,9 +82,6 @@ class OscilloscopeSphere {
         // Compute alpha attenuation for outer shell layers
         let layerAlpha = baseAlpha * (1.0 - layer * 0.3);
 
-        // Apply stroke color and alpha
-        stroke(50, 255, 130, layerAlpha);
-
         // Begin drawing horizontal vertex ring
         beginShape();
         for (let j = 0; j <= this.longitudes; j++) {
@@ -93,6 +90,15 @@ class OscilloscopeSphere {
           let xDir = sin(lat) * cos(lon);
           let yDir = cos(lat);
           let zDir = sin(lat) * sin(lon);
+
+          // If Yidan's Perlin mechanic provides a colour, use it so the sphere's surface
+          // can shift colour through noise. Otherwise, keep Hantao's original green stroke
+          // as a fallback so the sphere still works without Yidan's module.
+          if (this.deformationProvider && typeof this.deformationProvider.getSurfaceColor === 'function') {
+            stroke(this.deformationProvider.getSurfaceColor(xDir, yDir, zDir, layer, layerAlpha));
+          } else {
+            stroke(50, 255, 130, layerAlpha);
+          }
 
           // Combine baseline terrain data with current layer offset
           let bigWaves = noiseCache[i][j];
