@@ -8,7 +8,6 @@ let myPlanet;
 
 // Shared emotion value for the whole project.
 // -1 = unpleasant, 0 = neutral/calm, 1 = pleasant.
-// Other mechanics can read this same value to stay conceptually connected.
 let emotionValue = 0;
 
 // DOM references for the shared emotion slider UI.
@@ -23,7 +22,6 @@ let yidanPerlinMechanic;
 
 function preload() {
   // Preload Ying's heartbeat audio before setupAudio() tries to play it.
-  // Without this, the p5 sketch can stop before the canvas is rendered.
   preloadAudio();
 }
 
@@ -41,7 +39,6 @@ function setup() {
   myPlanet.setDeformationProvider(yidanPerlinMechanic);
 
   // Connect the HTML slider to the shared emotionValue.
-  // This keeps the UI separate from the p5.js canvas while still driving the artwork.
   emotionSlider = document.getElementById('emotion-slider');
   emotionLabel = document.getElementById('emotion-label');
 
@@ -64,42 +61,45 @@ function draw() {
   // Tilt camera on X-axis at a fixed angle for a perspective view
   rotateX(PI / 3.5);
 
-  // Merge activity levels from both sources
+  // Fetch the interpolated, ultra-smooth speed multiplier from Hantao's script
+  let emotionMultiplier = getHantaoSliderMultiplier();
+
+  // Track activity levels for other teammates' background mechanics
   let currentActivity = max(getHantaoInteraction(), getYingAudio());
+  
+  // Enforce slider multiplier on Yidan's perlin mechanic to allow freezing at 0
+  yidanPerlinMechanic.update(currentActivity * emotionMultiplier, emotionValue);
 
-  yidanPerlinMechanic.update(currentActivity, emotionValue);
-
+  // 1. Keep Jade's colour blending mechanic
   applyJadeColour();
 
-  // Increment rotation angle based on current activity scalar
-  hantao_rotationAngle += 0.001 * currentActivity;
+  // 2. Drive base rotation using Hantao's slider, but stack Jade's time scaling on top
+  hantao_rotationAngle += 0.001 * emotionMultiplier;
   hantao_rotationAngle += jade_timeScale * 0.0006;
 
   // Apply Y-axis rotation transformation
   rotateY(hantao_rotationAngle);
 
+  // 3. Keep Jade's radius scaling mechanic
   scale(jade_radiusScale); 
 
   // Draw Yidan's noisy emotional field inside the same 3D space as the sphere.
-  // This follows the Week 11 noisy-shapes idea, but adapts it into WEBGL.
   yidanPerlinMechanic.displayBackground();
 
   // Safely read Jade's time mechanic if the sphere later supports it.
-  // This avoids breaking the sketch while the time-based interface is still being integrated.
   if (typeof getJadeTime === 'function' && typeof myPlanet.setTimeState === 'function') {
     let jadeState = getJadeTime();
     myPlanet.setTimeState(jadeState);
   }
 
-  // Update the sphere's internal data state with current activity
-  myPlanet.update(currentActivity);
+  // Update the sphere's internal wave evolution speed with Hantao's smooth multiplier
+  myPlanet.update(emotionMultiplier);
 
   // Render the sphere geometry
   myPlanet.display();
 
+  // 4. Keep Jade's foreground layer rendering
   displayJadeLayer();
-
-
 }
 
 

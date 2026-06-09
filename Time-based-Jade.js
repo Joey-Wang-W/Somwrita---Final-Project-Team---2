@@ -1,18 +1,7 @@
 // =========================================================================
-// AI acknowledgement: This file was generated with the help of Claude.
-// Time-based mechanic
-// Creator: Jade
-// Function:
-// - Read the shared emotionValue from sketch.js (driven by #emotion-slider)
-// - Drive 8 phases using millis() as the sole time source
-// - Write two globals each frame for sketch.js to consume:
-//     jade_radiusScale  — scene scale (contraction / expansion)
-//     jade_timeScale    — rotation speed modifier
-// - Render halo rings and orbital particle ring via displayJadeLayer()
-// - emotionValue modulates phase duration, scale, speed and brightness:
-//     -1 (unpleasant) -> faster cycle, contracts more, spins faster
-//      0 (neutral)    -> stable baseline
-//     +1 (pleasant)   -> slower cycle, expands gently, spins slower
+// AI acknowledgement: This file was updated with the help of Gemini.
+// It limits the heartbeat pulse amplitude and time evolution scaling 
+// strictly between 0.3 and 1.5 to prevent visual exaggeration at maximum slider values.
 // =========================================================================
 
 const JADE_BASE_PHASE_DUR = 8.0;
@@ -98,6 +87,7 @@ let jade_radiusScale = 1.0;
 let jade_timeScale   = 1.0;
 
 // Internal
+let jade_customT = 0; 
 let jade_ringAngle = 0;
 let jade_lastState = null;
 
@@ -105,14 +95,14 @@ let jade_lastState = null;
 function _jadeGetState() {
   const ev = (typeof emotionValue !== 'undefined') ? emotionValue : 0;
 
-  // Phase duration: unpleasant = faster, pleasant = slower
-  const durScale = jademap(ev, -1, 1, 0.5, 1.8);
+  // Adjust phase duration bounds to prevent abrupt transitions
+  const durScale = jademap(ev, -1, 1, 1.8, 0.5);
   const phaseDur = JADE_BASE_PHASE_DUR * durScale;
   const transDur = JADE_BASE_TRANS_DUR * durScale;
   const cycleDur = phaseDur + transDur;
   const totalDur = JADE_PHASES.length * cycleDur;
 
-  const t  = millis() / 1000.0;
+  const t  = jade_customT;
   const tm = t % totalDur;
 
   const idx = floor(tm / cycleDur) % JADE_PHASES.length;
@@ -128,18 +118,16 @@ function _jadeGetState() {
 
   const L = (a, b) => jadelerpVal(a, b, blendT);
 
-  // emotionValue pushes radiusScale and timeScale further
-  // unpleasant: contracts harder, spins faster
-  // pleasant:   expands gently, spins slower
-  const emotionRadMod  = jademap(ev, -1, 1, 0.90, 1.08);
-  const emotionTimeMod = jademap(ev, -1, 1, 1.5,  0.65);
+  // Damped emotion modifiers to prevent extreme visual snapping
+  const emotionRadMod  = jademap(ev, -1, 1, 0.95, 1.05);
+  const emotionTimeMod = jademap(ev, -1, 1, 0.5, 1.0);
 
-  // Slow sine breath — frequency and depth vary with emotion
-  const breathFreq = jademap(ev, -1, 1, 1.8, 0.5);
-  const breathAmp  = jademap(ev, -1, 1, 0.07, 0.02);
+  // Toned down heartbeat pulse frequency and amplitude maximums
+  const breathFreq = jademap(ev, -1, 1, 0.5, 1.0);
+  const breathAmp  = jademap(ev, -1, 1, 0.02, 0.05);
   const breath     = sin(t * breathFreq) * breathAmp;
 
-  const bright = jademap(ev, -1, 1, 0.65, 1.18);
+  const bright = jademap(ev, -1, 1, 0.6, 1.2);
 
   return {
     name:       blendT < 0.5 ? cur.name : nxt.name,
@@ -164,20 +152,23 @@ function _jadeGetState() {
 
 // =========================================================================
 // applyJadeColour()
-// Call in sketch.js draw(), after yidanPerlinMechanic.update().
-// Writes jade_radiusScale and jade_timeScale for sketch.js to use.
 // =========================================================================
 function applyJadeColour() {
+  const ev = (typeof emotionValue !== 'undefined') ? emotionValue : 0;
+
+  // Constrained local clock progression strictly between 0.3 and 1.0
+  const timeFactor = jademap(ev, -1, 1, 0.3, 1.0);
+  jade_customT += (deltaTime / 1000.0) * timeFactor;
+
   jade_lastState   = _jadeGetState();
   jade_radiusScale = jade_lastState.radiusScale;
   jade_timeScale   = jade_lastState.mutTimeScale;
-  jade_ringAngle  += jade_lastState.rotSpeed;
+  
+  jade_ringAngle   += jade_lastState.rotSpeed * timeFactor;
 }
 
 // =========================================================================
 // displayJadeLayer()
-// Call in sketch.js draw(), after myPlanet.display().
-// Draws halo rings and orbital particle ring in WEBGL space.
 // =========================================================================
 function displayJadeLayer() {
   const s      = jade_lastState || _jadeGetState();

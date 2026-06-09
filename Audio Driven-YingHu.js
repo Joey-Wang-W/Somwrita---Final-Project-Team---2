@@ -1,7 +1,12 @@
 // =========================================================================
-// AI acknowledgement: This file was updated with the help of Codex.
 // Audio-driven mechanism
 // Creator: Ying Hu
+// AI acknowledgement: This file was updated with the help of Codex. 
+// Codex helped structure the crossfade and FFT/Amplitude analysis.
+// External references:
+// - p5.Amplitude reference: https://p5js.org/reference/p5.sound/p5.Amplitude/
+// - p5.FFT reference: https://p5js.org/reference/p5.sound/p5.FFT/
+// - userStartAudio reference: https://p5js.org/reference/p5/userStartAudio/
 // Function:
 // - Read the shared HTML emotion slider from sketch.js: emotionValue (-1..1)
 // - Crossfade several heartbeat audio tracks across the emotion range

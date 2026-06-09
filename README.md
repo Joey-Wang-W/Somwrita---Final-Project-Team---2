@@ -25,6 +25,27 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ---
 
+## Interaction Guide
+
+1. **Click anywhere on the canvas to begin the experience.**
+   The first click activates the audio system and starts the emotional soundscape. The heartbeat and ambient sound layers will begin playing and driving the ecosystem.
+
+2. **Adjust the emotion slider at the bottom of the screen.**
+   Move the slider between **Unpleasant**, **Neutral**, and **Pleasant** emotional states. Different emotional positions gradually blend different heartbeat rhythms, background soundscapes, colours, and visual behaviours.
+
+3. **Move the mouse slowly or rapidly across the screen.**
+   The system continuously records your movement patterns. Smooth and gentle motions create calmer responses, while fast or erratic movements introduce instability and turbulence into the ecosystem.
+
+4. **Observe the ecosystem as it evolves over time.**
+   Even without interaction, the emotional landscape continuously grows, transforms, contracts, and expands through its time-based lifecycle.
+
+5. **Experiment with different combinations of emotion and movement.**
+   Try changing the emotion slider while moving the mouse or triggering heartbeat pulses. Each combination creates a unique emotional ecosystem shaped by sound, time, interaction, and organic motion.
+
+
+
+---
+
 ## References / Inspirations  
 
 ![Inspiration](readmeImages/190e5227fbf7f904f8055828fb691cc3.jpg)
@@ -50,9 +71,33 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ## 1. Audio-driven Mechanism (Ying Hu)
 
-Users select their current emotion, triggering pre-set “heartbeat signal” audio that generates rhythmic data through variations in the heartbeat. Louder sounds translate into more intense “heartbeats,” driving the core structures of the visual system to expand, vibrate, or pulse. Simultaneously, different frequency bands are mapped to distinct visual attributes—such as color shifts or morphological changes—enabling the system to express more complex emotional states.
+### AI Usage Statement
+This file was updated with the help of Codex. Codex helped structure the crossfade and FFT/Amplitude analysis.
 
-On the interactive level, users can click the main object with a mouse to generate heartbeat sound feedback, transforming the “heartbeat” from a single physiological data point into a manipulable emotional signal. This mechanism reinforces the concept that “emotions can be amplified and externalized,” turning the audience into the triggers of the system’s emotional shifts.
+### Mechanism Overview
+The audio-driven system serves as the primary energy source of the Emotional Data Ecosystem. Instead of capturing real physiological heartbeat data, the project uses curated heartbeat recordings and emotional soundscapes to simulate different emotional states.
+
+A shared emotion slider controls three emotional zones—Unpleasant, Neutral, and Pleasant. Each emotional state contains two synchronized audio layers: Heartbeat audio (main emotional signal) and Ambient background audio (emotional atmosphere).
+
+The system continuously crossfades between these layers as the emotional value changes, creating smooth transitions rather than abrupt emotional shifts. The heartbeat remains the dominant signal, while the background sound enriches the emotional environment without overpowering the visual response.
+
+### Emotion-based Audio Crossfading
+The emotional slider ranges from -1 to 1 and blends between three emotional sound states. The transition between emotional states uses a smooth interpolation curve, allowing emotional changes to feel continuous and organic rather than mechanical. This crossfade mechanism reflects the idea that emotions rarely exist as fixed categories and instead move fluidly along a spectrum.
+
+### Audio Analysis
+To transform sound into visual behaviour, the system performs real-time audio analysis using both Amplitude analysis and FFT spectrum analysis. The heartbeat signal is analyzed continuously to generate an activity value that can be shared with the visual system. Low-frequency energy, especially bass frequencies associated with heartbeat rhythms, is given the strongest influence. This process transforms audio into a dynamic emotional force that drives the behaviour of the ecosystem.
+
+### Interactive Heartbeat Feedback
+User interaction directly influences the emotional system. The first click activates the audio environment and begins playback. These interactions temporarily increase the system’s activity level, causing stronger visual reactions and reinforcing the idea that emotions can be externally stimulated and amplified through interaction.
+
+
+### External references:
+- p5.Amplitude reference: https://p5js.org/reference/p5.sound/p5.Amplitude/
+- p5.FFT reference: https://p5js.org/reference/p5.sound/p5.FFT/
+- userStartAudio reference: https://p5js.org/reference/p5/userStartAudio/
+
+
+
 
 ---
 
