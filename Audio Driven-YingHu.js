@@ -9,10 +9,13 @@
 // =========================================================================
 
 let ying_fft;
+let ying_amplitude;
 let ying_audioActivity = 0.02;
 let ying_sounds = {};
 let ying_started = false;
 let ying_currentColor = [80, 180, 255];
+let ying_pan = 0;
+let ying_centroid = 0;
 
 // -1 = unpleasant, 0 = neutral, 1 = pleasant.
 const ying_emotionStops = [
@@ -61,6 +64,7 @@ function setupAudio() {
   }
 
   ying_fft = new p5.FFT(0.82, 64);
+  ying_amplitude = new p5.Amplitude(0.82);
   startYingAudio();
 }
 
@@ -107,10 +111,12 @@ function setYingGroupVolume(soundGroup, weight) {
 
   if (soundGroup.heartbeat) {
     soundGroup.heartbeat.setVolume(weight * ying_heartbeatVolume, 0.18);
+    soundGroup.heartbeat.pan(ying_pan);
   }
 
   if (soundGroup.background) {
     soundGroup.background.setVolume(weight * ying_backgroundVolume, 0.18);
+    soundGroup.background.pan(ying_pan * 0.6);
   }
 }
 
@@ -130,6 +136,7 @@ function startYingAudio() {
   const firstSound = getYingHeartbeat(ying_emotionStops[0].name);
   if (firstSound) {
     ying_fft.setInput(firstSound);
+    ying_amplitude.setInput(firstSound);
   }
 
   ying_started = true;
@@ -229,6 +236,10 @@ function getDominantYingSound(weights) {
 function updateAudioMix() {
   const emotion = getYingEmotionValue();
   const weights = getYingMix(emotion);
+  // Course reference: map a control value to pan().
+  // Here the shared emotion slider replaces mouseX: unpleasant leans left,
+  // neutral stays centred, and pleasant leans right.
+  ying_pan = map(emotion, -1, 1, -0.35, 0.35);
 
   for (const stop of ying_emotionStops) {
     setYingGroupVolume(ying_sounds[stop.name], weights[stop.name] || 0);
@@ -237,6 +248,7 @@ function updateAudioMix() {
   const dominantSound = getDominantYingSound(weights);
   if (dominantSound) {
     ying_fft.setInput(dominantSound);
+    ying_amplitude.setInput(dominantSound);
   }
 
   ying_currentColor = getWeightedColor(weights);
@@ -247,16 +259,17 @@ function getYingAudio() {
   const weights = updateAudioMix();
 
   let spectrum = ying_fft ? ying_fft.analyze() : [];
-  let bass = 0;
-  let lowMid = 0;
+  // Course reference: combine amplitude analysis with FFT frequency bands.
+  // The heartbeat remains the analysed source, so background music supports
+  // the mood without overpowering the visual reaction.
+  const rms = ying_amplitude ? ying_amplitude.getLevel() : 0;
+  const bass = ying_fft ? ying_fft.getEnergy('bass') / 255 : 0;
+  const lowMid = ying_fft ? ying_fft.getEnergy('lowMid') / 255 : 0;
+  const treble = ying_fft ? ying_fft.getEnergy('treble') / 255 : 0;
+  ying_centroid = ying_fft ? constrain(ying_fft.getCentroid() / 22050, 0, 1) : 0;
 
-  for (let i = 0; i < 8; i++) bass += spectrum[i] || 0;
-  for (let i = 8; i < 18; i++) lowMid += spectrum[i] || 0;
-
-  bass = bass / 8 / 255;
-  lowMid = lowMid / 10 / 255;
-
-  const rawEnergy = bass * 0.72 + lowMid * 0.28;
+  const spectralBrightness = treble * ying_centroid;
+  const rawEnergy = rms * 0.45 + bass * 0.35 + lowMid * 0.15 + spectralBrightness * 0.05;
   const boost = getWeightedAudioProperty(weights, 'boost');
   const targetActivity = constrain(map(rawEnergy * boost, 0, 1, 0.02, 3.0), 0.02, 3.0);
 
