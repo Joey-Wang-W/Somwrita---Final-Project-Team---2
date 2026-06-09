@@ -1,5 +1,5 @@
 // =========================================================================
-// AI acknowledgement: This file was updated with the help of Gemini.
+// AI acknowledgement: This file was updated with the help of Claud.
 // It limits the heartbeat pulse amplitude and time evolution scaling 
 // strictly between 0.3 and 1.5 to prevent visual exaggeration at maximum slider values.
 // =========================================================================
