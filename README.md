@@ -131,9 +131,9 @@ The halo rings and particle ring are drawn in the same WEBGL coordinate space as
 **Jade — Time-based**  
 Uses `millis()` as the sole time source to drive an 8-phase lifecycle. Each phase defines a target radius scale, rotation speed, halo ring appearance, and orbital particle ring density. Values interpolate smoothly between phases. The shared `emotionValue` slider modulates phase duration, contraction depth, rotation speed, and overall brightness:
 
-- `-1` unpleasant → faster cycle, tighter contraction, dimmer halo
+- `-1` unpleasant → slower cycle, gentel contraction, brighter halo
 - `0` neutral → stable baseline rhythm
-- `+1` pleasant → slower cycle, gentle expansion, brighter halo
+- `+1` pleasant → faster cycle, tighter expansion, dimmer halo
 
 Two globals (`jade_radiusScale`, `jade_timeScale`) are written each frame for `sketch.js` to consume via `scale()` and the rotation accumulator.
 
@@ -154,17 +154,6 @@ This is also noted in the file header comment inside `Time-based-Jade.js`.
 
 - **Heartbeat_Topography reference series** — visual inspiration for the 8 phase shapes.  
   Source: 小红书 @18920731411
-
----
-
-## Interaction Instructions
-
-1. Open the sketch in a browser and click anywhere on the canvas to start the audio.
-2. Use the emotion slider at the bottom of the screen:
-   - Drag left toward **Unpleasant** — the sphere contracts, rotates faster, and the halo dims. The phase cycle accelerates.
-   - Leave centred at **Neutral** — steady baseline rhythm.
-   - Drag right toward **Pleasant** — the sphere expands gently, rotation slows, and the halo brightens. The phase cycle lengthens.
-3. Watch the outer rings and particle orbit — these change colour and density automatically as the time-based phases cycle, approximately every 8–14 seconds depending on the emotion setting.
 
 ---
 
