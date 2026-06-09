@@ -27,8 +27,6 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ## Interaction Guide
 
-### Interaction Guide
-
 1. **Click anywhere on the canvas to begin the experience.**
    The first click activates the audio system and starts the emotional soundscape. The heartbeat and ambient sound layers will begin playing and driving the ecosystem.
 
