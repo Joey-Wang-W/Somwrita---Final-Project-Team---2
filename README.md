@@ -268,3 +268,19 @@ Together, they create a dynamic balance between order and chaos. The project is 
 
 ---
 
+# 4. Techniques 
+
+This project combines multiple p5.js techniques to transform emotional data into a living digital ecosystem. The system is built using a modular structure, where each team member contributes a different mechanism that communicates through shared variables and a common WEBGL environment.
+
+The project uses p5.js WEBGL to create a three-dimensional emotional landscape. The central sphere is generated through procedural geometry, with vertices continuously deformed using Perlin noise to create organic and evolving forms. A layered wireframe rendering approach is used to enhance depth and visual complexity.
+
+For the audio system, p5.sound is used to load, analyse, and crossfade multiple heartbeat and ambient sound tracks. p5.FFT and p5.Amplitude analyse real-time audio energy, allowing heartbeat rhythms and frequency information to drive visual activity and motion.
+
+The project also uses Perlin noise (noise()), seeded randomness (randomSeed() and noiseSeed()), and trigonometric functions such as sin() and cos() to generate smooth, natural-looking motion, colour transitions, atmospheric particles, and lifecycle behaviours. These techniques help the ecosystem feel organic rather than mechanical.
+
+User input is implemented through a shared HTML emotion slider and mouse interactions. The slider controls a global emotionValue variable that is read by all four mechanisms, allowing sound, time, deformation, colour, and movement to remain synchronized. Mouse clicks activate the audio system and trigger heartbeat pulses, while camera exploration is supported through p5.js's orbitControl().
+
+A key design decision was to use a shared emotional parameter rather than separate controls for each mechanic. This allows audio, time, Perlin noise, and interaction systems to influence one another and behave as parts of a single emotional organism. The result is a dynamic ecosystem where emotion, data, and user participation continuously shape the visual environment.
+
+---
+
