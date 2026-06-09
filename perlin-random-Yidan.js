@@ -131,7 +131,7 @@ class PerlinRandomMechanic {
     }
 
     // The background visualizes the emotional atmosphere around the main sphere.
-    // It uses Perlin noise to drift particles smoothly instead of moving them randomly.
+    // It uses Perlin noise to create subtle colour changes and star-like twinkling.
     displayBackground() {
 
         push();
@@ -150,16 +150,6 @@ class PerlinRandomMechanic {
 
             let flicker = noise(t + 90);
             let alpha = map(flicker, 0, 1, 45, 120);
-
-            // Each particle samples Perlin colour from its own position,
-            // so the dots change colour smoothly instead of all changing at once.
-            let particleColour = this.getSurfaceColor(
-                x / p.distance,
-                y / p.distance,
-                z / p.distance,
-                0,
-                alpha
-            );
 
             // Perlin noise creates a star-like twinkle.
             // The dots stay small, but their brightness changes more obviously.

@@ -39,12 +39,12 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ## Team Members & Responsibilities  
 
-| Member | Mechanism | Responsibility |
-|--------|----------|---------------|
-| Ying Hu | Audio-driven system | Capture and analyze sound data |
-| Jade Gu | Time-based system | Control lifecycle and transitions |
-| Yidan Wang | Perlin noise & randomness | Generate organic motion and forms |
-| Hantao Xu | User interaction | Design interaction and control system |
+| Member     | Mechanism                 | Responsibility                        |
+| ---------- | ------------------------- | ------------------------------------- |
+| Ying Hu    | Audio-driven system       | Capture and analyze sound data        |
+| Jade Gu    | Time-based system         | Control lifecycle and transitions     |
+| Yidan Wang | Perlin noise & randomness | Generate organic motion and forms     |
+| Hantao Xu  | User interaction          | Design interaction and control system |
 
 ---
 
@@ -67,12 +67,100 @@ This mechanism introduces a narrative dimension, simulating emotional cycles suc
 ---
 
 ## 3. Perlin Noise & Randomness (Yidan Wang)
+### AI Usage Statement
 
-This mechanism uses Perlin noise to generate smooth, continuous, and natural motion patterns. It controls particle behavior, deformation, and spatial distribution, allowing the visuals to resemble organic phenomena such as fluid, smoke, or biological growth.
+Some parts of this mechanism were developed with the assistance of AI tools. AI was used to help refine the structure of the Perlin noise system, suggest clearer code comments, and improve the written explanation for the README. The final creative direction, visual decisions, code selection, testing, and integration were reviewed and adjusted by the team member.
 
-Random seeds introduce variation across different runs, ensuring that each experience is unique while maintaining a consistent aesthetic language.
+### Mechanism Overview
 
-This system forms the generative core of the project, transforming abstract data into lifelike motion. It reinforces the concept of emotion as something fluid, unstable, and constantly evolving.
+This mechanism uses **Perlin noise and seeded randomness** to make the emotional ecosystem feel organic, unstable, and alive. It controls the sphere’s surface deformation, colour changes, and the surrounding atmospheric particles.
+
+| Visual Element       | Technique                | Role in the Project                             |
+| -------------------- | ------------------------ | ----------------------------------------------- |
+| Main sphere surface  | 3D Perlin noise          | Creates organic emotional deformation           |
+| Surface colour       | Perlin colour sampling   | Produces smooth colour transitions              |
+| Background particles | Seeded randomness        | Builds a unique atmosphere each run             |
+| Star-like flicker    | Perlin brightness change | Shows emotional energy in the surrounding space |
+| Emotion slider       | Shared `emotionValue`    | Connects this system to the group interaction   |
+
+---
+
+### Surface Deformation
+
+The main sphere samples Perlin noise across its 3D surface:
+
+```js
+getDeformation(xDir, yDir, zDir)
+```
+
+This creates smooth deformation instead of sudden random movement. The shared emotion slider changes the form:
+
+| Emotion State | Visual Behaviour            |
+| ------------- | --------------------------- |
+| Unpleasant    | Sharper and more unstable   |
+| Neutral       | Calmer and more balanced    |
+| Pleasant      | Smoother and more expansive |
+
+---
+
+### Perlin Colour System
+
+The sphere colour is also generated through Perlin noise:
+
+```js
+getSurfaceColor(xDir, yDir, zDir, layer, alpha)
+```
+
+Each point on the sphere samples a slightly different noise value, so the colour shifts gradually across the surface instead of changing as one flat colour.
+
+<div>
+  <span style="display:inline-block;width:90px;height:18px;background:#39d9ff;"></span>
+  <span style="display:inline-block;width:90px;height:18px;background:#55ff9a;"></span>
+  <span style="display:inline-block;width:90px;height:18px;background:#f4d35e;"></span>
+  <span style="display:inline-block;width:90px;height:18px;background:#ff4fa3;"></span>
+</div>
+
+The colour system supports the emotional direction of the project:
+
+| Emotion Direction | Colour Feeling                                    |
+| ----------------- | ------------------------------------------------- |
+| Unpleasant        | More uneasy magenta and acidic tones              |
+| Neutral           | Soft green tones connected to the original sphere |
+| Pleasant          | Calmer cyan, green, and warm highlights           |
+
+---
+
+### Seeded Randomness
+
+A new seed is created each time the sketch runs:
+
+```js
+this.seed = floor(random(100000));
+randomSeed(this.seed);
+noiseSeed(this.seed);
+```
+
+This gives each experience a slightly different visual personality while keeping the motion coherent. The background particles use seeded values for their position, size, distance, and noise offset.
+
+---
+
+### Atmospheric Star Particles
+
+The surrounding particles extend the emotional field beyond the main sphere. They use the same Perlin colour system, so the sphere and background feel connected.
+
+```js
+let sparkleAmount = abs(this.emotionValue);
+let twinkleNoise = noise(t * 8.0 + 120);
+let twinkle = pow(twinkleNoise, 3);
+```
+
+When the emotion slider is close to neutral, the particles stay subtle. When the slider moves away from neutral, they begin to twinkle like small stars.
+
+| Emotion Intensity | Particle Behaviour         |
+| ----------------- | -------------------------- |
+| Neutral           | Dim and calm               |
+| Medium            | Gentle flickering          |
+| Strong            | Brighter star-like twinkle |
 
 ---
 
