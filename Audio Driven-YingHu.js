@@ -14,37 +14,36 @@ let ying_sounds = {};
 let ying_started = false;
 let ying_currentColor = [80, 180, 255];
 
-// -1 = unpleasant, 0 = neutral/calm, 1 = pleasant.
+// -1 = unpleasant, 0 = neutral, 1 = pleasant.
 const ying_emotionStops = [
   {
-    name: 'sad',
+    name: 'unpleasant',
     value: -1.0,
-    file: 'sounds/heartbeat_sad.mp3',
+    heartbeatFile: 'sounds/heartbeat_sad.mp3',
+    backgroundFile: 'sounds/Sad background music.mp3',
     color: [90, 105, 225],
     boost: 1.15
   },
   {
-    name: 'anxious',
-    value: -0.35,
-    file: 'sounds/heartbeat_anxious.mp3',
-    color: [210, 80, 135],
-    boost: 2.35
-  },
-  {
-    name: 'calm',
-    value: 0.25,
-    file: 'sounds/heartbeat_calm.mp3',
+    name: 'neutral',
+    value: 0.0,
+    heartbeatFile: 'sounds/heartbeat_calm.mp3',
+    backgroundFile: 'sounds/calm background music.ogg',
     color: [80, 190, 255],
     boost: 1.45
   },
   {
-    name: 'excited',
+    name: 'pleasant',
     value: 1.0,
-    file: 'sounds/heartbeat_excited.mp3',
+    heartbeatFile: 'sounds/heartbeat_excited.mp3',
+    backgroundFile: 'sounds/happy background music.mp3',
     color: [255, 205, 55],
     boost: 4.75
   }
 ];
+
+const ying_heartbeatVolume = 1.0;
+const ying_backgroundVolume = 0.22;
 
 function preloadAudio() {
   for (const stop of ying_emotionStops) {
@@ -53,9 +52,10 @@ function preloadAudio() {
 }
 
 function setupAudio() {
+  // Keep preloadAudio optional so this module still works if sketch.js does not
   // define a p5 preload() hook.
   for (const stop of ying_emotionStops) {
-    if (!ying_sounds[stop.name]) {
+    if (!ying_sounds[stop.name]?.heartbeat || !ying_sounds[stop.name]?.background) {
       loadYingSound(stop);
     }
   }
@@ -65,16 +65,23 @@ function setupAudio() {
 }
 
 function loadYingSound(stop) {
-  ying_sounds[stop.name] = loadSound(stop.file, () => {
-    if (ying_started) {
-      prepareYingSound(stop);
-      updateAudioMix();
-    }
-  });
+  ying_sounds[stop.name] = {
+    heartbeat: loadSound(stop.heartbeatFile, () => {
+      if (ying_started) {
+        prepareYingSound(stop);
+        updateAudioMix();
+      }
+    }),
+    background: loadSound(stop.backgroundFile, () => {
+      if (ying_started) {
+        prepareYingSound(stop);
+        updateAudioMix();
+      }
+    })
+  };
 }
 
-function prepareYingSound(stop) {
-  const sound = ying_sounds[stop.name];
+function prepareSingleYingSound(sound) {
   if (!sound || !sound.isLoaded()) return false;
 
   sound.setVolume(0);
@@ -85,7 +92,34 @@ function prepareYingSound(stop) {
   return true;
 }
 
+function prepareYingSound(stop) {
+  const soundGroup = ying_sounds[stop.name];
+  if (!soundGroup) return false;
+
+  const heartbeatReady = prepareSingleYingSound(soundGroup.heartbeat);
+  const backgroundReady = prepareSingleYingSound(soundGroup.background);
+
+  return heartbeatReady || backgroundReady;
+}
+
+function setYingGroupVolume(soundGroup, weight) {
+  if (!soundGroup) return;
+
+  if (soundGroup.heartbeat) {
+    soundGroup.heartbeat.setVolume(weight * ying_heartbeatVolume, 0.18);
+  }
+
+  if (soundGroup.background) {
+    soundGroup.background.setVolume(weight * ying_backgroundVolume, 0.18);
+  }
+}
+
+function getYingHeartbeat(stopName) {
+  return ying_sounds[stopName]?.heartbeat;
+}
+
 function startYingAudio() {
+  // Calling this again from mousePressed is intentional: browsers usually need
   // a user gesture before the audio context is allowed to make sound.
   userStartAudio();
 
@@ -93,7 +127,7 @@ function startYingAudio() {
     prepareYingSound(stop);
   }
 
-  const firstSound = ying_sounds[ying_emotionStops[0].name];
+  const firstSound = getYingHeartbeat(ying_emotionStops[0].name);
   if (firstSound) {
     ying_fft.setInput(firstSound);
   }
@@ -150,7 +184,7 @@ function getYingMix(v) {
     }
   }
 
-  weights.calm = 1;
+  weights.neutral = 1;
   return weights;
 }
 
@@ -189,7 +223,7 @@ function getDominantYingSound(weights) {
     }
   }
 
-  return ying_sounds[strongestStop.name];
+  return getYingHeartbeat(strongestStop.name);
 }
 
 function updateAudioMix() {
@@ -197,10 +231,7 @@ function updateAudioMix() {
   const weights = getYingMix(emotion);
 
   for (const stop of ying_emotionStops) {
-    const sound = ying_sounds[stop.name];
-    if (sound) {
-      sound.setVolume(weights[stop.name] || 0, 0.18);
-    }
+    setYingGroupVolume(ying_sounds[stop.name], weights[stop.name] || 0);
   }
 
   const dominantSound = getDominantYingSound(weights);
