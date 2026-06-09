@@ -1,32 +1,27 @@
 // =========================================================================
-// AI acknowledgement: This file was generated with the help of Gemini, 
-// based on the interactive concepts and logic framework provided by the user. 
-// It implements a decay model to map mouse kinetic energy onto system activity.
-// External references: Uses native p5.js lerp() for linear interpolation.
+// AI acknowledgement: This file was updated with the help of Gemini, 
+// based on the user's concept to centralize slider-driven velocity control.
+// It reads the HTML slider, maps it to a speed coefficient, and applies 
+// a linear interpolation (lerp) filter to ensure smooth speed transitions.
 // =========================================================================
 
-let hantao_energyPool = 0; 
-let hantao_smoothedActivity = 0.02; // Initial baseline activity (2%)
+// Cache the smoothed multiplier to create kinetic inertia when dragging the slider
+let hantao_smoothedMultiplier = 1.0; 
 
+function getHantaoSliderMultiplier() {
+  // 1. Safely read the global HTML slider value from index.html (fallback to 0)
+  let rawSliderVal = emotionSlider ? Number(emotionSlider.value) : 0;
+  
+  // 2. Map the emotion range (-1 to 1) to the sphere's speed limits (0.3 to 3.0)
+  let targetMultiplier = map(rawSliderVal, -1, 1, 0.3, 3.0);
+  
+  // 3. Apply a damping filter so the sphere changes speed smoothly instead of snapping abruptly
+  hantao_smoothedMultiplier = lerp(hantao_smoothedMultiplier, targetMultiplier, 0.05);
+  
+  return hantao_smoothedMultiplier;
+}
+
+// Retained to ensure backward compatibility with teammates' code referencing this function
 function getHantaoInteraction() {
-  // 1. Calculate mouse distance per frame and filter out anomalies
-  let frameDistance = dist(mouseX, mouseY, pmouseX, pmouseY);
-  if (frameDistance > 300) frameDistance = 0;
-
-  // 2. Accumulate movement distance into the energy pool
-  hantao_energyPool += frameDistance * 0.03;
-
-  // 3. Core deceleration mechanism to slow down
-  hantao_energyPool *= 0.95;
-
-  // Constrain energy pool between 0.0 and 1.0
-  hantao_energyPool = constrain(hantao_energyPool, 0, 1.0);
-
-  // 4. Map energy to target velocity and activity range (0.02 to 3.0)
-  let targetActivity = map(hantao_energyPool, 0, 1.0, 0.02, 3.0);
-  
-  // 5. Smooth transition using linear interpolation
-  hantao_smoothedActivity = lerp(hantao_smoothedActivity, targetActivity, 0.1);
-  
-  return hantao_smoothedActivity;
+  return 0; 
 }
