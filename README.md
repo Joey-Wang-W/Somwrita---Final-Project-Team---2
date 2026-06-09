@@ -50,9 +50,18 @@ In this system, emotion is visualized as a living, evolving digital entity. Thro
 
 ## 1. Audio-driven Mechanism (Ying Hu)
 
-Users select their current emotion, triggering pre-set “heartbeat signal” audio that generates rhythmic data through variations in the heartbeat. Louder sounds translate into more intense “heartbeats,” driving the core structures of the visual system to expand, vibrate, or pulse. Simultaneously, different frequency bands are mapped to distinct visual attributes—such as color shifts or morphological changes—enabling the system to express more complex emotional states.
+The audio-driven system serves as the primary energy source of the Emotional Data Ecosystem. Instead of capturing real physiological heartbeat data, the project uses curated heartbeat recordings and emotional soundscapes to simulate different emotional states.
 
-On the interactive level, users can click the main object with a mouse to generate heartbeat sound feedback, transforming the “heartbeat” from a single physiological data point into a manipulable emotional signal. This mechanism reinforces the concept that “emotions can be amplified and externalized,” turning the audience into the triggers of the system’s emotional shifts.
+A shared emotion slider controls three emotional zones—Unpleasant, Neutral, and Pleasant. Each emotional state contains two synchronized audio layers: Heartbeat audio (main emotional signal) and Ambient background audio (emotional atmosphere).
+
+The system continuously crossfades between these layers as the emotional value changes, creating smooth transitions rather than abrupt emotional shifts. The heartbeat remains the dominant signal, while the background sound enriches the emotional environment without overpowering the visual response.
+
+The emotional slider ranges from -1 to 1 and blends between three emotional sound states. The transition between emotional states uses a smooth interpolation curve, allowing emotional changes to feel continuous and organic rather than mechanical. This crossfade mechanism reflects the idea that emotions rarely exist as fixed categories and instead move fluidly along a spectrum.
+
+To transform sound into visual behaviour, the system performs real-time audio analysis using both Amplitude analysis and FFT spectrum analysis. The heartbeat signal is analyzed continuously to generate an activity value that can be shared with the visual system. Low-frequency energy, especially bass frequencies associated with heartbeat rhythms, is given the strongest influence. This process transforms audio into a dynamic emotional force that drives the behaviour of the ecosystem.
+
+User interaction directly influences the emotional system. The first click activates the audio environment and begins playback. Afterwards, clicking near the central sphere triggers an additional heartbeat pulse. These interactions temporarily increase the system’s activity level, causing stronger visual reactions and reinforcing the idea that emotions can be externally stimulated and amplified through interaction.
+
 
 ---
 
