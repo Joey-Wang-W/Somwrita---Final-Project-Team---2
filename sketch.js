@@ -20,6 +20,9 @@ let hantao_rotationAngle = 0;
 
 let yidanPerlinMechanic;
 
+let jadeState = getJadeTime();
+myPlanet.setTimeState(jadeState);
+
 function setup() {
   // Create WEBGL 3D rendering canvas
   createCanvas(windowWidth, windowHeight, WEBGL);
